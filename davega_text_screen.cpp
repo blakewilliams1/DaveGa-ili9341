@@ -23,8 +23,8 @@
 #include "vesc_comm.h"
 #include "tft_util.h"
 #include "Adafruit_ILI9341.h"
-#include <Fonts/FreeSans9pt7b.h>
-#include <Fonts/FreeSans12pt7b.h>
+//#include <Fonts/FreeSans9pt7b.h>
+//#include <Fonts/FreeSans12pt7b.h>
 
 void DavegaTextScreen::reset() {
     _tft->fillRect(0, 0, 220 - 1, 176 - 1, ILI9341_BLACK);
@@ -180,7 +180,7 @@ void DavegaTextScreen::_write_line_buffer(int lineno, uint16_t color = ILI9341_W
     _line_buffer[MAX_LINE_LENGTH] = '\0';
 
     int y = lineno * (_config->big_font ? 19 : 12) + 5;
-    _tft->setFont(_config->big_font ? &FreeSans12pt7b : &FreeSans9pt7b);
+   // _tft->setFont(_config->big_font ? &FreeSans12pt7b : &FreeSans9pt7b);
     _tft->setTextColor(color);
     _tft->setCursor(5, y);
     _tft->print(_line_buffer);

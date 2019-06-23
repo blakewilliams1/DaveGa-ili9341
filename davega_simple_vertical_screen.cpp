@@ -23,14 +23,14 @@
 #include "vesc_comm.h"
 #include "tft_util.h"
 #include "Adafruit_ILI9341.h"
-#include <Fonts/FreeSans9pt7b.h>
-#include <Fonts/FreeSans12pt7b.h>
+//#include <Fonts/FreeSans9pt7b.h>
+//#include <Fonts/FreeSans12pt7b.h>
 
 void DavegaSimpleVerticalScreen::reset() {
     _tft->fillRect(0, 0, 220 - 1, 176 - 1, ILI9341_BLACK);
 
     // labels
-    _tft->setFont(&FreeSans9pt7b);
+   // _tft->setFont(&FreeSans9pt7b);
     _tft->setTextColor(ILI9341_WHITE);
     _tft->setCursor(0, 130);
     _tft->print(_config->imperial_units ? "TRIP MI" : "TRIP KM");
@@ -97,7 +97,7 @@ void DavegaSimpleVerticalScreen::update(t_davega_data *data) {
     if (data->vesc_fault_code != FAULT_CODE_NONE) {
         uint16_t bg_color = _tft->color565(150, 0, 0);
         _tft->fillRect(0, 180, 176, 220, bg_color);
-        _tft->setFont(&FreeSans12pt7b);
+      //  _tft->setFont(&FreeSans12pt7b);
         //_tft->setBackgroundColor(bg_color);
         _tft->setTextColor(ILI9341_BLACK);
         _tft->setCursor(5, 193);

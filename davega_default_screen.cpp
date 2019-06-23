@@ -23,8 +23,8 @@
 #include "vesc_comm.h"
 #include "tft_util.h"
 #include "Adafruit_ILI9341.h"
-#include <Fonts/FreeSans9pt7b.h>
-#include <Fonts/FreeSans12pt7b.h>
+//#include <Fonts/FreeSans9pt7b.h>
+//#include <Fonts/FreeSans12pt7b.h>
 
 #define BATTERY_INDICATOR_CELL_WIDTH 14
 #define BATTERY_INDICATOR_CELL_HEIGHT 15
@@ -73,7 +73,7 @@ void DavegaDefaultScreen::reset() {
     _draw_labels();
 
     // draw FW version
-    _tft->setFont(&FreeSans9pt7b);
+  //  _tft->setFont(&FreeSans9pt7b);
     _tft->setTextColor(ILI9341_WHITE);
     _tft->setCursor(40, 140);
     _tft->print(_config->fw_version);
@@ -118,7 +118,7 @@ void DavegaDefaultScreen::update(t_davega_data* data) {
     if (data->vesc_fault_code != FAULT_CODE_NONE) {
         uint16_t bg_color = ILI9341_RED;
         _tft->fillRect(0, 60, 176, 83, bg_color);
-        _tft->setFont(&FreeSans12pt7b);
+      //  _tft->setFont(&FreeSans12pt7b);
         _tft->setTextColor(ILI9341_BLACK);
         _tft->setCursor(5, 65);
         _tft->print(vesc_fault_code_to_string(data->vesc_fault_code));
@@ -139,7 +139,7 @@ void DavegaDefaultScreen::heartbeat(uint32_t duration_ms, bool successful_vesc_r
 }
 
 void DavegaDefaultScreen::_draw_labels() {
-    _tft->setFont(&FreeSans9pt7b);
+   // _tft->setFont(&FreeSans9pt7b);
 
     _tft->setTextColor(ILI9341_WHITE);
     _tft->setCursor(36, 48);
