@@ -22,20 +22,20 @@
 
 #define MAX_LINE_LENGTH 30
 
-#include <TFT_22_ILI9225.h>
-#include "davega_ili9225_screen.h"
+#include "Adafruit_ILI9341.h"
+#include "davega_ili9341_screen.h"
 
-class DavegaTextScreen: public DavegaILI9225Screen {
+class DavegaTextScreen: public DavegaILI9341Screen {
 public:
     void reset();
     void update(t_davega_data* data);
     void heartbeat(uint32_t duration_ms, bool successful_vesc_read);
 
 protected:
-    void _write_numeric_line(float value, const char* units, const char* label, int lineno, uint16_t color = COLOR_WHITE);
-    void _write_time_line(uint32_t seconds, const char* label, int lineno, uint16_t color = COLOR_WHITE);
-    void _write_text_line(char* value, int lineno, uint16_t color = COLOR_WHITE);
-    void _write_line_buffer(int lineno, uint16_t color = COLOR_WHITE);
+    void _write_numeric_line(float value, const char* units, const char* label, int lineno, uint16_t color = ILI9341_WHITE);
+    void _write_time_line(uint32_t seconds, const char* label, int lineno, uint16_t color = ILI9341_WHITE);
+    void _write_text_line(char* value, int lineno, uint16_t color = ILI9341_WHITE);
+    void _write_line_buffer(int lineno, uint16_t color = ILI9341_WHITE);
 
     char _line_buffer[MAX_LINE_LENGTH+1];
 };

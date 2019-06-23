@@ -25,8 +25,8 @@
 
 #define VESC_COUNT 2  // number of controllers: 1 = single, 2 = dual (set to 1 for FOCBOX Unity unless you have more than 1)
 #define MOTOR_POLE_PAIRS 7
-#define WHEEL_DIAMETER_MM 192
-#define MOTOR_PULLEY_TEETH 15
+#define WHEEL_DIAMETER_MM 200
+#define MOTOR_PULLEY_TEETH 10
 #define WHEEL_PULLEY_TEETH 72
 
 // Affects the speed indicator. If MAX_SPEED_KPH is exceeded, no major disaster will happen.
@@ -38,11 +38,11 @@
 #define IMPERIAL_UNITS false
 
 // Set to true to display the temperature in Fahrenheit instead of Celsius.
-#define USE_FAHRENHEIT false
+#define USE_FAHRENHEIT true
 
 #define BATTERY_S 12  // number of battery cells
-#define BATTERY_MAX_MAH 8000  // battery capacity in mAh
-#define BATTERY_USABLE_CAPACITY 0.8  // [0.0, 1.0]
+#define BATTERY_MAX_MAH 18000  // battery capacity in mAh
+#define BATTERY_USABLE_CAPACITY 0.9  // [0.0, 1.0]
 
 // If SHOW_AVG_CELL_VOLTAGE is true, average cell voltage is displayed instead of the total battery
 // pack voltage (total voltage is divided by the number of cells).
@@ -128,14 +128,14 @@
 #define UPDATE_DELAY 50  // ms
 
 // 0=portrait, 1=right rotated landscape, 2=reverse portrait, 3=left rotated landscape
-#define SCREEN_ORIENTATION 0
+#define SCREEN_ORIENTATION 1
 
 // Screens. Uncomment the ones you want enabled.
 //#define DEFAULT_SCREEN_ENABLED 1
 //#define SIMPLE_HORIZONTAL_SCREEN_ENABLED 1
-//#define SIMPLE_HORIZONTAL_SCREEN_WITH_BATTERY_CURRENT_ENABLED 1
+#define SIMPLE_HORIZONTAL_SCREEN_WITH_BATTERY_CURRENT_ENABLED 1
 //#define SIMPLE_HORIZONTAL_SCREEN_WITH_MOTOR_CURRENT_ENABLED 1
-#define SIMPLE_VERTICAL_SCREEN_ENABLED 1
+//#define SIMPLE_VERTICAL_SCREEN_ENABLED 1
 //#define SIMPLE_VERTICAL_SCREEN_WITH_BATTERY_CURRENT_ENABLED 1
 //#define SIMPLE_VERTICAL_SCREEN_WITH_MOTOR_CURRENT_ENABLED 1
 #define TEXT_SCREEN_ENABLED 1
@@ -184,6 +184,6 @@
 
 // Big font is only recommended for landscape orientation. 9 lines fit on the screen then.
 // Some items overflow the right order. You may want to adjust the labels in davega_text_screen.cpp.
-#define TEXT_SCREEN_BIG_FONT false
+#define TEXT_SCREEN_BIG_FONT true
 
 #endif //DAVEGA_DAVEGA_CONFIG_H

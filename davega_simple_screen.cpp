@@ -19,25 +19,25 @@
 
 #include "davega_simple_screen.h"
 #include "davega_util.h"
-#include <TFT_22_ILI9225.h>
+#include "Adafruit_ILI9341.h"
 
 uint16_t primary_item_color(t_screen_item screen_item, t_davega_data* data, t_davega_screen_config* config) {
-    uint16_t color = COLOR_WHITE;
+    uint16_t color = ILI9341_WHITE;
     if (screen_item == SCR_BATTERY_CURRENT || screen_item == SCR_MOTOR_CURRENT) {
         float value = screen_item == SCR_BATTERY_CURRENT ? data->battery_amps : data->motor_amps;
         if (value < 0)
-            color = COLOR_RED;
+            color = ILI9341_RED;
         if (value >= 100)
-            color = COLOR_YELLOW;
+            color = ILI9341_YELLOW;
         if (value >= 200)
-            color = COLOR_BLUEVIOLET;
+            color = ILI9341_BLUE;
     }
     else {
         // speed
         if (data->speed_kph > SS_RED_SPEED_KPH)
-            color = COLOR_RED;
+            color = ILI9341_RED;
         else if (data->speed_kph > SS_YELLOW_SPEED_KPH)
-            color = COLOR_YELLOW;
+            color = ILI9341_YELLOW;
     }
     return color;
 }

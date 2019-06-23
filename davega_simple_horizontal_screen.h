@@ -20,11 +20,12 @@
 #ifndef DAVEGA_SIMPLE_HORIZONTAL_SCREEN_H
 #define DAVEGA_SIMPLE_HORIZONTAL_SCREEN_H
 
-#include <TFT_22_ILI9225.h>
-#include "davega_ili9225_screen.h"
+#include "Adafruit_ILI9341.h"
+#include "Adafruit_GFX.h"
+#include "davega_ili9341_screen.h"
 #include "davega_simple_screen.h"
 
-class DavegaSimpleHorizontalScreen: public DavegaILI9225Screen {
+class DavegaSimpleHorizontalScreen: public DavegaILI9341Screen {
 public:
     DavegaSimpleHorizontalScreen(t_screen_item primary_item) { _primary_item = primary_item; }
     void reset();

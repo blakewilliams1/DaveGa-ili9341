@@ -22,7 +22,9 @@
 #include "davega_util.h"
 #include "vesc_comm.h"
 #include "tft_util.h"
-#include <TFT_22_ILI9225.h>
+#include "Adafruit_ILI9341.h"
+#include <Fonts/FreeSans9pt7b.h>
+#include <Fonts/FreeSans12pt7b.h>
 
 #define BATTERY_INDICATOR_CELL_WIDTH 14
 #define BATTERY_INDICATOR_CELL_HEIGHT 15
@@ -67,12 +69,14 @@ const Point PROGMEM SPEED_INDICATOR_CELLS[] = {
 };
 
 void DavegaDefaultScreen::reset() {
-    _tft->fillRectangle(0, 0, _tft->maxX() - 1, _tft->maxY() - 1, COLOR_BLACK);
+    _tft->fillRect(0, 0, 200 - 1, 176 - 1,  ILI9341_BLACK);
     _draw_labels();
 
     // draw FW version
-    _tft->setFont(Terminal6x8);
-    _tft->drawText(40, 140, _config->fw_version, COLOR_WHITE);
+    _tft->setFont(&FreeSans9pt7b);
+    _tft->setTextColor(ILI9341_WHITE);
+    _tft->setCursor(40, 140);
+    _tft->print(_config->fw_version);
 
     _just_reset = true;
 }
@@ -88,36 +92,36 @@ void DavegaDefaultScreen::update(t_davega_data* data) {
         dtostrf(data->voltage / _config->battery_cells, 4, 2, fmt);
     else
         dtostrf(data->voltage, 4, 1, fmt);
-    tft_util_draw_number(_tft, fmt, 24, 25, COLOR_WHITE, COLOR_BLACK, 2, 4);
+    tft_util_draw_number(_tft, fmt, 24, 25,  ILI9341_WHITE,  ILI9341_BLACK, 2, 4);
 
     // draw mah
     dtostrf(data->mah, 5, 0, fmt);
-    tft_util_draw_number(_tft, fmt, 84, 25, progress_to_color(data->mah_reset_progress, _tft), COLOR_BLACK, 2, 4);
+    tft_util_draw_number(_tft, fmt, 84, 25, progress_to_color(data->mah_reset_progress, _tft),  ILI9341_BLACK, 2, 4);
 
     // draw trip distance
     dtostrf(convert_distance(data->trip_km, _config->imperial_units), 5, 2, fmt);
-    tft_util_draw_number(_tft, fmt, 24, 185, progress_to_color(data->session_reset_progress, _tft), COLOR_BLACK, 2, 4);
+    tft_util_draw_number(_tft, fmt, 24, 185, progress_to_color(data->session_reset_progress, _tft),  ILI9341_BLACK, 2, 4);
 
     // draw total distance
     dtostrf(convert_distance(data->total_km, _config->imperial_units), 4, 0, fmt);
-    tft_util_draw_number(_tft, fmt, 98, 185, COLOR_WHITE, COLOR_BLACK, 2, 4);
+    tft_util_draw_number(_tft, fmt, 98, 185,  ILI9341_WHITE,  ILI9341_BLACK, 2, 4);
 
     // draw speed
     uint8_t speed = round(convert_speed(data->speed_kph, _config->imperial_units));
     if (speed >= 10)
-        tft_util_draw_digit(_tft, speed / 10, 60, 91, COLOR_WHITE, COLOR_BLACK, 7);
+        tft_util_draw_digit(_tft, speed / 10, 60, 91,  ILI9341_WHITE,  ILI9341_BLACK, 7);
     else
-        _tft->fillRectangle(60, 91, 82, 127, COLOR_BLACK);
-    tft_util_draw_digit(_tft, speed % 10, 89, 91, COLOR_WHITE, COLOR_BLACK, 7);
+        _tft->fillRect(60, 91, 82, 127,  ILI9341_BLACK);
+        tft_util_draw_digit(_tft, speed % 10, 89, 91,  ILI9341_WHITE,  ILI9341_BLACK, 7);
 
     // draw warning
     if (data->vesc_fault_code != FAULT_CODE_NONE) {
-        uint16_t bg_color = _tft->setColor(150, 0, 0);
-        _tft->fillRectangle(0, 60, 176, 83, bg_color);
-        _tft->setFont(Terminal12x16);
-        _tft->setBackgroundColor(bg_color);
-        _tft->drawText(5, 65, vesc_fault_code_to_string(data->vesc_fault_code), COLOR_BLACK);
-        _tft->setBackgroundColor(COLOR_BLACK);
+        uint16_t bg_color = ILI9341_RED;
+        _tft->fillRect(0, 60, 176, 83, bg_color);
+        _tft->setFont(&FreeSans12pt7b);
+        _tft->setTextColor(ILI9341_BLACK);
+        _tft->setCursor(5, 65);
+        _tft->print(vesc_fault_code_to_string(data->vesc_fault_code));
     }
 
     _update_speed_indicator(data->speed_percent, _just_reset);
@@ -128,30 +132,40 @@ void DavegaDefaultScreen::update(t_davega_data* data) {
 }
 
 void DavegaDefaultScreen::heartbeat(uint32_t duration_ms, bool successful_vesc_read) {
-    uint16_t color = successful_vesc_read ? _tft->setColor(0, 150, 0) : _tft->setColor(150, 0, 0);
-    _tft->fillRectangle(85, 155, 89, 159, color);
+    uint16_t color = successful_vesc_read ? ILI9341_GREEN : ILI9341_RED;
+    _tft->fillRect(85, 155, 89, 159, color);
     delay(duration_ms);
-    _tft->fillRectangle(85, 155, 89, 159, COLOR_BLACK);
+    _tft->fillRect(85, 155, 89, 159,  ILI9341_BLACK);
 }
 
 void DavegaDefaultScreen::_draw_labels() {
-    _tft->setFont(Terminal6x8);
+    _tft->setFont(&FreeSans9pt7b);
 
-    _tft->drawText(36, 48, "VOLTS", COLOR_WHITE);
-    _tft->drawText(132, 48, "MAH", COLOR_WHITE);
+    _tft->setTextColor(ILI9341_WHITE);
+    _tft->setCursor(36, 48);
+    _tft->print("VOLTS");
+    _tft->setCursor(132, 48);
+    _tft->print("MAH");
 
-    _tft->drawText(90, 131, _config->imperial_units ? "MPH" : "KPH", COLOR_WHITE);
+    _tft->setCursor(90, 131);
+    _tft->print(_config->imperial_units ? "MPH" : "KPH");
 
-    _tft->drawText(23, 175, "TRIP", COLOR_WHITE);
-    _tft->drawText(97, 175, "TOTAL", COLOR_WHITE);
+    _tft->setCursor(23, 175);
+    _tft->print("TRIP");
+    _tft->setCursor(97, 175);
+    _tft->print("TOTAL");
 
     if (_config->imperial_units) {
-        _tft->drawText(50, 208, "MILES", COLOR_WHITE);
-        _tft->drawText(119, 208, "MILES", COLOR_WHITE);
+        _tft->setCursor(50, 208);
+        _tft->print("MILES");
+        _tft->setCursor(119, 208);
+        _tft->print("MILES");
     }
     else {
-        _tft->drawText(70, 208, "KM", COLOR_WHITE);
-        _tft->drawText(139, 208, "KM", COLOR_WHITE);
+        _tft->setCursor(70, 208);
+        _tft->print("KM");
+        _tft->setCursor(139, 208);
+        _tft->print("KM");
     }
 }
 
@@ -162,18 +176,18 @@ bool DavegaDefaultScreen::_draw_battery_cell(int index, bool filled, bool redraw
         uint8_t cell_count = LEN(BATTERY_INDICATOR_CELLS);
         uint8_t green = (uint8_t)(255.0 / (cell_count - 1) * index);
         uint8_t red = 255 - green;
-        uint16_t color = _tft->setColor(red, green, 0);
-        _tft->fillRectangle(
+        uint16_t color = _tft->color565(red, green, 0);
+        _tft->fillRect(
                 p->x, p->y,
                 p->x + BATTERY_INDICATOR_CELL_WIDTH, p->y + BATTERY_INDICATOR_CELL_HEIGHT,
                 color
         );
     }
     if (!filled) {
-        _tft->fillRectangle(
+        _tft->fillRect(
                 p->x + 1, p->y + 1,
                 p->x + BATTERY_INDICATOR_CELL_WIDTH - 1, p->y + BATTERY_INDICATOR_CELL_HEIGHT - 1,
-                COLOR_BLACK
+                ILI9341_BLACK
         );
     }
 }
@@ -201,17 +215,17 @@ void DavegaDefaultScreen::_draw_speed_cell(int index, bool filled, bool redraw =
     uint16_t p_word = pgm_read_word_near(SPEED_INDICATOR_CELLS + index);
     Point *p = (Point *) &p_word;
     if (filled || redraw) {
-        _tft->fillRectangle(
+        _tft->fillRect(
                 p->x, p->y,
                 p->x + SPEED_INDICATOR_CELL_WIDTH, p->y + SPEED_INDICATOR_CELL_HEIGHT,
-                _tft->setColor(150, 150, 255)
+                _tft->color565(150, 150, 255)
         );
     }
     if (!filled) {
-        _tft->fillRectangle(
+        _tft->fillRect(
                 p->x + 1, p->y + 1,
                 p->x + SPEED_INDICATOR_CELL_WIDTH - 1, p->y + SPEED_INDICATOR_CELL_HEIGHT - 1,
-                COLOR_BLACK
+                 ILI9341_BLACK
         );
     }
 }

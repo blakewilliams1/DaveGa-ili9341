@@ -22,10 +22,12 @@
 #include "davega_util.h"
 #include "vesc_comm.h"
 #include "tft_util.h"
-#include <TFT_22_ILI9225.h>
+#include "Adafruit_ILI9341.h"
+#include <Fonts/FreeSans9pt7b.h>
+#include <Fonts/FreeSans12pt7b.h>
 
 void DavegaTextScreen::reset() {
-    _tft->fillRectangle(0, 0, _tft->maxX() - 1, _tft->maxY() - 1, COLOR_BLACK);
+    _tft->fillRect(0, 0, 220 - 1, 176 - 1, ILI9341_BLACK);
 }
 
 void DavegaTextScreen::update(t_davega_data *data) {
@@ -116,14 +118,14 @@ void DavegaTextScreen::update(t_davega_data *data) {
 }
 
 void DavegaTextScreen::heartbeat(uint32_t duration_ms, bool successful_vesc_read) {
-    uint16_t color = successful_vesc_read ? _tft->setColor(0, 150, 0) : _tft->setColor(150, 0, 0);
-    _tft->fillRectangle(167, 5, 171, 9, color);
+    uint16_t color = successful_vesc_read ? ILI9341_GREEN :ILI9341_RED;
+    _tft->fillRect(167, 5, 171, 9, color);
     delay(duration_ms);
-    _tft->fillRectangle(167, 5, 171, 9, COLOR_BLACK);
+    _tft->fillRect(167, 5, 171, 9, ILI9341_BLACK);
 }
 
 void DavegaTextScreen::_write_numeric_line(
-        float value, const char* units, const char* label, int lineno, uint16_t color = COLOR_WHITE) {
+        float value, const char* units, const char* label, int lineno, uint16_t color = ILI9341_WHITE) {
     for (int i=0; i < MAX_LINE_LENGTH; i++)
         _line_buffer[i] = ' ';
     dtostrf(value, 8, 2, _line_buffer);
@@ -137,7 +139,7 @@ void DavegaTextScreen::_write_numeric_line(
     _write_line_buffer(lineno, color);
 }
 
-void DavegaTextScreen::_write_time_line(uint32_t seconds, const char* label, int lineno, uint16_t color = COLOR_WHITE) {
+void DavegaTextScreen::_write_time_line(uint32_t seconds, const char* label, int lineno, uint16_t color = ILI9341_WHITE) {
     for (int i=0; i < MAX_LINE_LENGTH; i++)
         _line_buffer[i] = ' ';
     uint32_t hours = seconds / 3600;
@@ -163,7 +165,7 @@ void DavegaTextScreen::_write_time_line(uint32_t seconds, const char* label, int
     _write_line_buffer(lineno, color);
 }
 
-void DavegaTextScreen::_write_text_line(char* value, int lineno, uint16_t color = COLOR_WHITE) {
+void DavegaTextScreen::_write_text_line(char* value, int lineno, uint16_t color = ILI9341_WHITE) {
     for (int i=0; i<strlen(value); i++)
         _line_buffer[i] = value[i];
     _line_buffer[strlen(value)] = '\0';
@@ -171,13 +173,15 @@ void DavegaTextScreen::_write_text_line(char* value, int lineno, uint16_t color 
     _write_line_buffer(lineno, color);
 }
 
-void DavegaTextScreen::_write_line_buffer(int lineno, uint16_t color = COLOR_WHITE) {
+void DavegaTextScreen::_write_line_buffer(int lineno, uint16_t color = ILI9341_WHITE) {
     // space padding
     for (int i=strlen(_line_buffer); i < MAX_LINE_LENGTH; i++)
         _line_buffer[i] = ' ';
     _line_buffer[MAX_LINE_LENGTH] = '\0';
 
     int y = lineno * (_config->big_font ? 19 : 12) + 5;
-    _tft->setFont(_config->big_font ? Terminal11x16 : Terminal6x8, true);
-    _tft->drawText(5, y, _line_buffer, color);
+    _tft->setFont(_config->big_font ? &FreeSans12pt7b : &FreeSans9pt7b);
+    _tft->setTextColor(color);
+    _tft->setCursor(5, y);
+    _tft->print(_line_buffer);
 }

@@ -17,25 +17,19 @@
     along with DAVEga firmware.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "davega_ili9225_screen.h"
+#ifndef DAVEGA_ILI9341_SCREEN_H
+#define DAVEGA_ILI9341_SCREEN_H
 
-#define TFT_RST 12
-#define TFT_RS  9
-#define TFT_CS  10  // SS
-#define TFT_SDI 11  // MOSI
-#define TFT_CLK 13  // SCK
-#define TFT_LED 0
+#include "davega_screen.h"
+#include "Adafruit_ILI9341.h"
 
-TFT_22_ILI9225 tft = TFT_22_ILI9225(TFT_RST, TFT_RS, TFT_CS, TFT_LED, 200);
-TFT_22_ILI9225* p_tft = nullptr;
+class DavegaILI9341Screen: public DavegaScreen {
+public:
+    void init(t_davega_screen_config* config) override;
 
-void DavegaILI9225Screen::init(t_davega_screen_config *config) {
-    DavegaScreen::init(config);
-    if (!p_tft) {
-        p_tft = &tft;
-        p_tft->begin();
-        p_tft->setOrientation(config->orientation);
-        p_tft->setBackgroundColor(COLOR_BLACK);
-    }
-    _tft = p_tft;
-}
+protected:
+
+    Adafruit_ILI9341* _tft;
+};
+
+#endif //DAVEGA_ILI9341_H
