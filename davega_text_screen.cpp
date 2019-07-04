@@ -27,7 +27,7 @@
 //#include <Fonts/FreeSans12pt7b.h>
 
 void DavegaTextScreen::reset() {
-    _tft->fillRect(0, 0, 220 - 1, 176 - 1, ILI9341_BLACK);
+    _tft->fillScreen(ILI9341_BLACK);
 }
 
 void DavegaTextScreen::update(t_davega_data *data) {
@@ -184,4 +184,8 @@ void DavegaTextScreen::_write_line_buffer(int lineno, uint16_t color = ILI9341_W
     _tft->setTextColor(color);
     _tft->setCursor(5, y);
     _tft->print(_line_buffer);
+}
+
+void DavegaTextScreen::handleTouchInput() {
+  
 }

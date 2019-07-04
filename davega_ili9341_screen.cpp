@@ -19,16 +19,15 @@
 
 #include "davega_ili9341_screen.h"
 
-#define TFT_RST 12
-#define TFT_RS  9
-#define TFT_CS  10  // SS
-#define TFT_SDI 11  // MOSI
-#define TFT_CLK 13  // SCK
+#define TFT_MISO 12
+#define TFT_RST 8
+#define TFT_DC  9
+#define TFT_CS  10
+#define TFT_MOSI 11
+#define TFT_CLK 13
 #define TFT_LED 0
 
-// TODO: Fix constructor args if needed.
-Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_SDI);
-//TFT_22_ILI9225 tft = TFT_22_ILI9225(TFT_RST, TFT_RS, TFT_CS, TFT_LED, 200);
+Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_MOSI, TFT_CLK, TFT_RST, TFT_MISO);
 Adafruit_ILI9341* p_tft = nullptr;
 
 void DavegaILI9341Screen::init(t_davega_screen_config *config) {
@@ -37,8 +36,9 @@ void DavegaILI9341Screen::init(t_davega_screen_config *config) {
         p_tft = &tft;
         p_tft->begin();
         p_tft->setRotation(config->orientation);
-        //p_tft->setBackgroundColor(ILI9341_BLACK);
-        p_tft->fillRect(0,0, 220, 176, ILI9341_BLACK);
+        p_tft->fillScreen(ILI9341_BLACK);
+        Serial.println("initialized screen");
     }
     _tft = p_tft;
+    
 }

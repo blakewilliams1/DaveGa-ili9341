@@ -27,7 +27,7 @@
 #define REVISION_ID "$Id: ca658c2601bcf00dee70bada1de15351e591c9a4 $"
 #define FW_VERSION "master"
 
-//#define DEBUG
+#define DEBUG
 #ifdef DEBUG
 #define D(x) Serial.println(x)
 #else
@@ -256,6 +256,7 @@ void setup() {
 }
 
 void loop() {
+    scr->handleTouchInput();
     if (digitalRead(BUTTON_3_PIN) == LOW) {
         current_screen_index = (current_screen_index + 1) % LEN(davega_screens);
         scr = davega_screens[current_screen_index];

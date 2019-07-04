@@ -69,7 +69,7 @@ const Point PROGMEM SPEED_INDICATOR_CELLS[] = {
 };
 
 void DavegaDefaultScreen::reset() {
-    _tft->fillRect(0, 0, 200 - 1, 176 - 1,  ILI9341_BLACK);
+    _tft->fillScreen(ILI9341_BLACK);
     _draw_labels();
 
     // draw FW version
@@ -117,8 +117,7 @@ void DavegaDefaultScreen::update(t_davega_data* data) {
     // draw warning
     if (data->vesc_fault_code != FAULT_CODE_NONE) {
         uint16_t bg_color = ILI9341_RED;
-        _tft->fillRect(0, 60, 176, 83, bg_color);
-      //  _tft->setFont(&FreeSans12pt7b);
+        _tft->fillScreen(bg_color);
         _tft->setTextColor(ILI9341_BLACK);
         _tft->setCursor(5, 65);
         _tft->print(vesc_fault_code_to_string(data->vesc_fault_code));

@@ -23,11 +23,9 @@
 #include "vesc_comm.h"
 #include "tft_util.h"
 #include "Adafruit_ILI9341.h"
-//#include <Fonts/FreeSans9pt7b.h>
-//#include <Fonts/FreeSans12pt7b.h>
 
 void DavegaSimpleHorizontalScreen::reset() {
-    _tft->fillRect(0, 0, 220 - 1, 176 - 1, ILI9341_BLACK);
+    _tft->fillScreen(ILI9341_BLACK);
 
     // labels
   //  _tft->setFont(&FreeSans9pt7b);
@@ -90,9 +88,7 @@ void DavegaSimpleHorizontalScreen::update(t_davega_data *data) {
     // warning
     if (data->vesc_fault_code != FAULT_CODE_NONE) {
         uint16_t bg_color = ILI9341_RED;
-        _tft->fillRect(0, 140, 220, 176, bg_color);
-        //_tft->setFont(&FreeSans12pt7b);
-        //_tft->setBackgroundColor(bg_color);
+        _tft->fillScreen(bg_color);
         _tft->setTextColor(ILI9341_BLACK);
         _tft->setCursor(5, 151);
         _tft->print(vesc_fault_code_to_string(data->vesc_fault_code));
@@ -132,4 +128,8 @@ void DavegaSimpleHorizontalScreen::heartbeat(uint32_t duration_ms, bool successf
     _tft->fillRect(67, 116, 71, 120, color);
     delay(duration_ms);
     _tft->fillRect(67, 116, 71, 120, ILI9341_BLACK);
+}
+
+void DavegaSimpleHorizontalScreen::handleTouchInput() {
+
 }

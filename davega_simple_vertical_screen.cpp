@@ -27,7 +27,7 @@
 //#include <Fonts/FreeSans12pt7b.h>
 
 void DavegaSimpleVerticalScreen::reset() {
-    _tft->fillRect(0, 0, 220 - 1, 176 - 1, ILI9341_BLACK);
+    _tft->fillScreen(ILI9341_BLACK);
 
     // labels
    // _tft->setFont(&FreeSans9pt7b);
@@ -96,7 +96,7 @@ void DavegaSimpleVerticalScreen::update(t_davega_data *data) {
     // warning
     if (data->vesc_fault_code != FAULT_CODE_NONE) {
         uint16_t bg_color = _tft->color565(150, 0, 0);
-        _tft->fillRect(0, 180, 176, 220, bg_color);
+        _tft->fillScreen(bg_color);
       //  _tft->setFont(&FreeSans12pt7b);
         //_tft->setBackgroundColor(bg_color);
         _tft->setTextColor(ILI9341_BLACK);
@@ -138,4 +138,8 @@ void DavegaSimpleVerticalScreen::heartbeat(uint32_t duration_ms, bool successful
     _tft->fillRect(68, 1, 72, 5, color);
     delay(duration_ms);
     _tft->fillRect(68, 1, 72, 5, ILI9341_BLACK);
+}
+
+void DavegaSimpleVerticalScreen::handleTouchInput() {
+
 }
