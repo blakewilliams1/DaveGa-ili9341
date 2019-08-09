@@ -119,9 +119,9 @@ void DavegaTextScreen::update(t_davega_data *data) {
 
 void DavegaTextScreen::heartbeat(uint32_t duration_ms, bool successful_vesc_read) {
     uint16_t color = successful_vesc_read ? ILI9341_GREEN :ILI9341_RED;
-    _tft->fillRect(167, 5, 171, 9, color);
+    _tft->fillRect(167, 5, 4, 4, color);
     delay(duration_ms);
-    _tft->fillRect(167, 5, 171, 9, ILI9341_BLACK);
+    _tft->fillRect(167, 5, 4, 4, ILI9341_BLACK);
 }
 
 void DavegaTextScreen::_write_numeric_line(

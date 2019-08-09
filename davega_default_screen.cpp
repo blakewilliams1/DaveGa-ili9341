@@ -178,14 +178,14 @@ bool DavegaDefaultScreen::_draw_battery_cell(int index, bool filled, bool redraw
         uint16_t color = _tft->color565(red, green, 0);
         _tft->fillRect(
                 p->x, p->y,
-                p->x + BATTERY_INDICATOR_CELL_WIDTH, p->y + BATTERY_INDICATOR_CELL_HEIGHT,
+                BATTERY_INDICATOR_CELL_WIDTH, BATTERY_INDICATOR_CELL_HEIGHT,
                 color
         );
     }
     if (!filled) {
         _tft->fillRect(
                 p->x + 1, p->y + 1,
-                p->x + BATTERY_INDICATOR_CELL_WIDTH - 1, p->y + BATTERY_INDICATOR_CELL_HEIGHT - 1,
+                BATTERY_INDICATOR_CELL_WIDTH - 1, BATTERY_INDICATOR_CELL_HEIGHT - 1,
                 ILI9341_BLACK
         );
     }
@@ -216,14 +216,14 @@ void DavegaDefaultScreen::_draw_speed_cell(int index, bool filled, bool redraw =
     if (filled || redraw) {
         _tft->fillRect(
                 p->x, p->y,
-                p->x + SPEED_INDICATOR_CELL_WIDTH, p->y + SPEED_INDICATOR_CELL_HEIGHT,
+                SPEED_INDICATOR_CELL_WIDTH, SPEED_INDICATOR_CELL_HEIGHT,
                 _tft->color565(150, 150, 255)
         );
     }
     if (!filled) {
         _tft->fillRect(
                 p->x + 1, p->y + 1,
-                p->x + SPEED_INDICATOR_CELL_WIDTH - 1, p->y + SPEED_INDICATOR_CELL_HEIGHT - 1,
+                SPEED_INDICATOR_CELL_WIDTH, SPEED_INDICATOR_CELL_HEIGHT,
                  ILI9341_BLACK
         );
     }

@@ -101,7 +101,7 @@ void tft_util_draw_digit(
             uint16_t color = FONT_DIGITS_3x5[digit][yy][xx] ? fg_color : bg_color;
             int x1 = x + xx * magnify;
             int y1 = y + yy * magnify;
-            tft->fillRect(x1, y1, x1 + magnify - 1, y1 + magnify - 1, color);
+            tft->fillRect(x1, y1, magnify - 1, magnify - 1, color);
         }
     }
 }
@@ -117,15 +117,15 @@ void tft_util_draw_number(
             tft_util_draw_digit(tft, ch - '0', cursor_x, y, fg_color, bg_color, magnify);
             cursor_x += 3 * magnify + spacing;
         } else if (ch == '.') {
-            tft->fillRect(cursor_x, y, cursor_x + magnify - 1, y + 5 * magnify - 1, bg_color);
-            tft->fillRect(cursor_x, y + 4 * magnify, cursor_x + magnify - 1, y + 5 * magnify - 1, fg_color);
+            tft->fillRect(cursor_x, y, magnify - 1, 5 * magnify, bg_color);
+            tft->fillRect(cursor_x, y + 4 * magnify, magnify, 5 * magnify - 4 * magnify, fg_color);
             cursor_x += magnify + spacing;
         } else if (ch == '-') {
-            tft->fillRect(cursor_x, y, cursor_x + 3 * magnify - 1, y + 5 * magnify - 1, bg_color);
-            tft->fillRect(cursor_x, y + 2 * magnify, cursor_x + 3 * magnify - 1, y + 3 * magnify - 1, fg_color);
+            tft->fillRect(cursor_x, y, 3 * magnify, 5 * magnify, bg_color);
+            tft->fillRect(cursor_x, y + 2 * magnify, 3 * magnify, 3 * magnify - (2 * magnify), fg_color);
             cursor_x += 3 * magnify + spacing;
         } else if (ch == ' ') {
-            tft->fillRect(cursor_x, y, cursor_x + 3 * magnify - 1, y + 5 * magnify - 1, bg_color);
+            tft->fillRect(cursor_x, y, 3 * magnify, 5 * magnify, bg_color);
             cursor_x += 3 * magnify + spacing;
         }
     }

@@ -19,15 +19,16 @@
 
 #include "davega_ili9341_screen.h"
 
+// For the Adafruit shield, these are the default.
 #define TFT_MISO 12
-#define TFT_RST 8
-#define TFT_DC  9
+#define TFT_RST 9
+#define TFT_DC  8
 #define TFT_CS  10
 #define TFT_MOSI 11
 #define TFT_CLK 13
-#define TFT_LED 0
 
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_MOSI, TFT_CLK, TFT_RST, TFT_MISO);
+
 Adafruit_ILI9341* p_tft = nullptr;
 
 void DavegaILI9341Screen::init(t_davega_screen_config *config) {

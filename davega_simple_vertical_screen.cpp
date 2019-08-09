@@ -125,9 +125,9 @@ void DavegaSimpleVerticalScreen::_update_battery_indicator(float battery_percent
             uint8_t green = (uint8_t)(255.0 / (cell_count - 1) * i);
             uint8_t red = 255 - green;
             uint16_t color = _tft->color565(red, green, 0);//setColor(red, green, 0);
-            _tft->fillRect(153, y, 175, y + height, color);
+            _tft->fillRect(153, y, 22, height, color);
             if (!should_be_filled)
-                _tft->fillRect(153 + 1, y + 1, 175 - 1, y + height - 1, ILI9341_BLACK);
+                _tft->fillRect(153 + 1, y + 1, 20, height - 1, ILI9341_BLACK);
         }
     }
     _battery_cells_filled = cells_to_fill;
@@ -135,9 +135,9 @@ void DavegaSimpleVerticalScreen::_update_battery_indicator(float battery_percent
 
 void DavegaSimpleVerticalScreen::heartbeat(uint32_t duration_ms, bool successful_vesc_read) {
     uint16_t color = successful_vesc_read ? ILI9341_GREEN : ILI9341_RED;
-    _tft->fillRect(68, 1, 72, 5, color);
+    _tft->fillRect(68, 1, 4, 4, color);
     delay(duration_ms);
-    _tft->fillRect(68, 1, 72, 5, ILI9341_BLACK);
+    _tft->fillRect(68, 1, 4, 4, ILI9341_BLACK);
 }
 
 void DavegaSimpleVerticalScreen::handleTouchInput() {

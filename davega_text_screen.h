@@ -22,7 +22,7 @@
 
 #define MAX_LINE_LENGTH 30
 
-#include "Adafruit_ILI9341.h"
+#include <Adafruit_ILI9341.h>
 #include "davega_ili9341_screen.h"
 
 class DavegaTextScreen: public DavegaILI9341Screen {

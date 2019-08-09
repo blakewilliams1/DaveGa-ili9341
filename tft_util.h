@@ -20,7 +20,7 @@
 #ifndef TFT_UTIL_H
 #define TFT_UTIL_H
 
-#include "Adafruit_ILI9341.h"
+#include <Adafruit_ILI9341.h>
 
 void tft_util_draw_digit(
         Adafruit_ILI9341* tft, uint8_t digit, uint8_t x, uint8_t y,

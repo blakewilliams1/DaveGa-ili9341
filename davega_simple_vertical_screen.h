@@ -20,7 +20,7 @@
 #ifndef DAVEGA_SIMPLE_VERTICAL_SCREEN_H
 #define DAVEGA_SIMPLE_VERTICAL_SCREEN_H
 
-#include "Adafruit_ILI9341.h"
+#include <Adafruit_ILI9341.h>
 #include "davega_ili9341_screen.h"
 #include "davega_simple_screen.h"
 
