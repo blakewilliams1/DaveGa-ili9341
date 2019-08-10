@@ -27,27 +27,19 @@
 void DavegaSimpleHorizontalScreen::reset() {
     _tft->fillScreen(ILI9341_BLACK);
 
-    // labels
-  //  _tft->setFont(&FreeSans9pt7b);
     _tft->setTextColor(ILI9341_WHITE);
-    _tft->setCursor(174, 29);
     _tft->print(_config->imperial_units ? "TRIP MI" : "TRIP KM");
-    _tft->setCursor(166, 72);
     _tft->print(_config->imperial_units ? "TOTAL MI" : "TOTAL KM");
-    _tft->setCursor(158, 115);
     _tft->print("BATTERY V");
 
     switch (_primary_item) {
         case SCR_BATTERY_CURRENT:
-            _tft->setCursor(79, 115);
             _tft->print("BATTERY A");
             break;
         case SCR_MOTOR_CURRENT:
-            _tft->setCursor(93, 115);
             _tft->print("MOTOR A");
             break;
         default:
-            _tft->setCursor(119, 115);
             _tft->print(_config->imperial_units ? "MPH" : "KPH");
     }
 
@@ -68,31 +60,30 @@ void DavegaSimpleHorizontalScreen::update(t_davega_data *data) {
     uint8_t value = primary_item_value(_primary_item, data, _config);
     uint16_t color = primary_item_color(_primary_item, data, _config);
     dtostrf(value, 2, 0, fmt);
-    tft_util_draw_number(_tft, fmt, 0, 0, color, ILI9341_BLACK, 7, 22);
+    tft_util_draw_number(_tft, fmt, 0, 0, color, ILI9341_BLACK, 7, 32);
 
     // trip distance
     dtostrf(convert_distance(data->trip_km, _config->imperial_units), 5, 2, fmt);
-    tft_util_draw_number(_tft, fmt, 147, 0, progress_to_color(data->session_reset_progress, _tft), ILI9341_BLACK, 2, 5);
+    tft_util_draw_number(_tft, fmt, 200, 0, progress_to_color(data->session_reset_progress, _tft), ILI9341_BLACK, 3, 8);
 
     // total distance
     format_total_distance(convert_distance(data->total_km, _config->imperial_units), fmt);
-    tft_util_draw_number(_tft, fmt, 147, 43, ILI9341_WHITE, ILI9341_BLACK, 2, 5);
+    tft_util_draw_number(_tft, fmt, 200, 63, ILI9341_WHITE, ILI9341_BLACK, 3, 8);
 
     // battery voltage
     if (_config->per_cell_voltage)
         dtostrf(data->voltage / _config->battery_cells, 4, 2, fmt);
     else
         dtostrf(data->voltage, 4, 1, fmt);
-    tft_util_draw_number(_tft, fmt, 163, 86, progress_to_color(data->mah_reset_progress, _tft), ILI9341_BLACK, 2, 5);
+    tft_util_draw_number(_tft, fmt, 222, 125, progress_to_color(data->mah_reset_progress, _tft), ILI9341_BLACK, 3, 8);
 
     // warning
     if (data->vesc_fault_code != FAULT_CODE_NONE) {
         uint16_t bg_color = ILI9341_RED;
         _tft->fillScreen(bg_color);
         _tft->setTextColor(ILI9341_BLACK);
-        _tft->setCursor(5, 151);
+        _tft->setCursor(7, 220);
         _tft->print(vesc_fault_code_to_string(data->vesc_fault_code));
-        //_tft->setBackgroundColor(ILI9341_BLACK);
     }
 
     _update_battery_indicator(data->battery_percent, _just_reset);
@@ -102,9 +93,9 @@ void DavegaSimpleHorizontalScreen::update(t_davega_data *data) {
 }
 
 void DavegaSimpleHorizontalScreen::_update_battery_indicator(float battery_percent, bool redraw = false) {
-    int width = 17;
-    int space = 3;
-    int cell_count = 11;
+    float width = 25;
+    float space = 4;
+    float cell_count = 11;
 
     int cells_to_fill = round(battery_percent * cell_count);
     for (int i=0; i<cell_count; i++) {
@@ -115,9 +106,8 @@ void DavegaSimpleHorizontalScreen::_update_battery_indicator(float battery_perce
             uint8_t green = (uint8_t)(255.0 / (cell_count - 1) * i);
             uint8_t red = 255 - green;
             uint16_t color = _tft->color565(red, green, 0);
-            _tft->fillRect(x, 140, width, 35, color);
+            _tft->fillRect(x, 204, width, 35, color);
             if (!should_be_filled)
-                _tft->fillRect(x + 1, 140 + 1, width - 1, 33, ILI9341_BLACK);
         }
     }
     _battery_cells_filled = cells_to_fill;
@@ -125,9 +115,9 @@ void DavegaSimpleHorizontalScreen::_update_battery_indicator(float battery_perce
 
 void DavegaSimpleHorizontalScreen::heartbeat(uint32_t duration_ms, bool successful_vesc_read) {
     uint16_t color = successful_vesc_read ? ILI9341_GREEN : ILI9341_RED;
-    _tft->fillRect(67, 116, 4, 4, color);
+    _tft->fillRect(91, 167, 6, 6, color);
     delay(duration_ms);
-    _tft->fillRect(67, 116, 4, 4, ILI9341_BLACK);
+    _tft->fillRect(91, 167, 6, 6, ILI9341_BLACK);
 }
 
 void DavegaSimpleHorizontalScreen::handleTouchInput() {
