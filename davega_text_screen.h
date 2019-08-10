@@ -30,7 +30,7 @@ public:
     void reset();
     void update(t_davega_data* data);
     void heartbeat(uint32_t duration_ms, bool successful_vesc_read);
-    void handleTouchInput();
+    t_davega_touch_input handleTouchInput();
 
 protected:
     void _write_numeric_line(float value, const char* units, const char* label, int lineno, uint16_t color = ILI9341_WHITE);

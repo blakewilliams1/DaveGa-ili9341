@@ -256,8 +256,9 @@ void setup() {
 }
 
 void loop() {
-    scr->handleTouchInput();
-    if (digitalRead(BUTTON_3_PIN) == LOW) {
+    // Process current screen's touch input and hardware button input.
+    t_davega_touch_input touch_state = scr->handleTouchInput();
+    if (digitalRead(BUTTON_3_PIN) == LOW || touch_state.button_3_pressed) {
         current_screen_index = (current_screen_index + 1) % LEN(davega_screens);
         scr = davega_screens[current_screen_index];
         scr->reset();

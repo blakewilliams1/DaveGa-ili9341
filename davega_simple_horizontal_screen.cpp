@@ -30,9 +30,9 @@ void DavegaSimpleHorizontalScreen::reset() {
     _tft->setTextColor(ILI9341_WHITE);
     _tft->setCursor(274, 42);
     _tft->print(_config->imperial_units ? "TRIP MI" : "TRIP KM");
-    _tft->setCursor(266, 105);
+    _tft->setCursor(266, 103);
     _tft->print(_config->imperial_units ? "TOTAL MI" : "TOTAL KM");
-    _tft->setCursor(258, 167);
+    _tft->setCursor(258, 163);
     _tft->print("BATTERY V");
 
     switch (_primary_item) {
@@ -48,6 +48,20 @@ void DavegaSimpleHorizontalScreen::reset() {
             _tft->setCursor(180, 167);
             _tft->print(_config->imperial_units ? "MPH" : "KPH");
     }
+
+    // Draw the touch input buttons. Only needs to happen once, they don't update look.
+    _tft->setTextColor(ILI9341_BLACK);
+    _tft->fillRect(2, 220, 101, 20, ILI9341_WHITE);
+    _tft->setCursor(30, 227);
+    _tft->print("BUTTON 1");
+
+    _tft->fillRect(109, 220, 101, 20, ILI9341_WHITE);
+    _tft->setCursor(137, 227);
+    _tft->print("BUTTON 2");
+
+    _tft->fillRect(216, 220, 101, 20, ILI9341_WHITE);
+    _tft->setCursor(244, 227);
+    _tft->print("BUTTON 3");
 
     // FW version
     _tft->setCursor(0, 115);
@@ -74,14 +88,15 @@ void DavegaSimpleHorizontalScreen::update(t_davega_data *data) {
 
     // total distance
     format_total_distance(convert_distance(data->total_km, _config->imperial_units), fmt);
-    tft_util_draw_number(_tft, fmt, 200, 63, ILI9341_WHITE, ILI9341_BLACK, 3, 8);
+    tft_util_draw_number(_tft, fmt, 200, 61, ILI9341_WHITE, ILI9341_BLACK, 3, 8);
 
     // battery voltage
-    if (_config->per_cell_voltage)
-        dtostrf(data->voltage / _config->battery_cells, 4, 2, fmt);
-    else
-        dtostrf(data->voltage, 4, 1, fmt);
-    tft_util_draw_number(_tft, fmt, 222, 125, progress_to_color(data->mah_reset_progress, _tft), ILI9341_BLACK, 3, 8);
+    if (_config->per_cell_voltage) {
+      dtostrf(data->voltage / _config->battery_cells, 4, 2, fmt);
+    } else {
+      dtostrf(data->voltage, 4, 1, fmt);
+    }
+    tft_util_draw_number(_tft, fmt, 222, 121, progress_to_color(data->mah_reset_progress, _tft), ILI9341_BLACK, 3, 8);
 
     // warning
     if (data->vesc_fault_code != FAULT_CODE_NONE) {
@@ -89,10 +104,11 @@ void DavegaSimpleHorizontalScreen::update(t_davega_data *data) {
         _tft->fillScreen(bg_color);
         _tft->setTextColor(ILI9341_BLACK);
         _tft->setCursor(7, 220);
-        _tft->print(vesc_fault_code_to_string(data->vesc_fault_code));
+        _tft->print("test code");
+    } else {
+      _update_battery_indicator(data->battery_percent, _just_reset);
     }
 
-    _update_battery_indicator(data->battery_percent, _just_reset);
 
     _last_fault_code = data->vesc_fault_code;
     _just_reset = false;
@@ -112,9 +128,9 @@ void DavegaSimpleHorizontalScreen::_update_battery_indicator(float battery_perce
             uint8_t green = (uint8_t)(255.0 / (cell_count - 1) * i);
             uint8_t red = 255 - green;
             uint16_t color = _tft->color565(red, green, 0);
-            _tft->fillRect(x, 204, width, 35, color);
+            _tft->fillRect(x, 179, width, 35, color);
             if (!should_be_filled)
-                _tft->fillRect(x + 1, 205, width - 2, 33, ILI9341_BLACK);
+                _tft->fillRect(x + 1, 180, width - 2, 33, ILI9341_BLACK);
         }
     }
     _battery_cells_filled = cells_to_fill;
@@ -127,11 +143,18 @@ void DavegaSimpleHorizontalScreen::heartbeat(uint32_t duration_ms, bool successf
     _tft->fillRect(91, 167, 6, 6, ILI9341_BLACK);
 }
 
-void DavegaSimpleHorizontalScreen::handleTouchInput() {
+t_davega_touch_input DavegaSimpleHorizontalScreen::handleTouchInput() {
   if (_touch->dataAvailable()) {
     _touch->read();
     int touch_x = _touch->getX();
     int touch_y = _touch->getY();
-    
+
+    boolean button_1_pressed = touch_x < 105 && touch_y >=190;
+    boolean button_2_pressed = touch_x >= 105 && touch_x < 215 && touch_y >=190;
+    boolean button_3_pressed = true;//touch_x >= 215 && touch_y >=190;
+
+    return {button_1_pressed, button_2_pressed, button_3_pressed};
   }
+
+  return {};
 }

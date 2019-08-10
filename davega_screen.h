@@ -56,13 +56,19 @@ typedef struct {
     uint8_t orientation;
 } t_davega_screen_config;
 
+typedef struct {
+    bool button_1_pressed;
+    bool button_2_pressed;
+    bool button_3_pressed;
+} t_davega_touch_input;
+
 class DavegaScreen {
 public:
     virtual void init(t_davega_screen_config* config) { _config = config; };
     virtual void reset() = 0;
     virtual void update(t_davega_data* data) = 0;
     virtual void heartbeat(uint32_t duration_ms, bool successful_vesc_read) = 0;
-    virtual void handleTouchInput() = 0;
+    virtual t_davega_touch_input handleTouchInput() = 0;
 
 protected:
     t_davega_screen_config* _config;

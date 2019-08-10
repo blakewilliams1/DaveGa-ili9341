@@ -174,18 +174,19 @@ void DavegaTextScreen::_write_text_line(char* value, int lineno, uint16_t color 
 }
 
 void DavegaTextScreen::_write_line_buffer(int lineno, uint16_t color = ILI9341_WHITE) {
+  int line_length = strlen(_line_buffer);
     // space padding
     for (int i=strlen(_line_buffer); i < MAX_LINE_LENGTH; i++)
         _line_buffer[i] = ' ';
     _line_buffer[MAX_LINE_LENGTH] = '\0';
 
-    int y = lineno * (_config->big_font ? 19 : 12) + 5;
-   // _tft->setFont(_config->big_font ? &FreeSans12pt7b : &FreeSans9pt7b);
+    int y = lineno * 12;
     _tft->setTextColor(color);
-    _tft->setCursor(5, y);
+    _tft->setCursor(5 + (y / 240) * 160, y);
+    _tft->fillRect(5, y, line_length * 4, 8, ILI9341_BLACK);
     _tft->print(_line_buffer);
 }
 
-void DavegaTextScreen::handleTouchInput() {
-  
+t_davega_touch_input DavegaTextScreen::handleTouchInput() {
+  return {};
 }
