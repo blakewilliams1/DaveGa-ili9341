@@ -128,5 +128,10 @@ void DavegaSimpleHorizontalScreen::heartbeat(uint32_t duration_ms, bool successf
 }
 
 void DavegaSimpleHorizontalScreen::handleTouchInput() {
-
+  if (_touch->dataAvailable()) {
+    _touch->read();
+    int touch_x = _touch->getX();
+    int touch_y = _touch->getY();
+    
+  }
 }

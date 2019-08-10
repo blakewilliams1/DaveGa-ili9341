@@ -28,8 +28,16 @@
 #define TFT_CLK 13
 
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_MOSI, TFT_CLK, TFT_RST, TFT_MISO);
-
 Adafruit_ILI9341* p_tft = nullptr;
+
+#define TCLK 3
+#define TCS 4
+#define TDIN 5
+#define DOUT 6
+#define IRQ 7
+
+URTouch touch = URTouch(IRQ, DOUT, TDIN, TCS, TCLK);
+URTouch* p_touch = nullptr;
 
 void DavegaILI9341Screen::init(t_davega_screen_config *config) {
     DavegaScreen::init(config);
@@ -39,7 +47,15 @@ void DavegaILI9341Screen::init(t_davega_screen_config *config) {
         p_tft->setRotation(config->orientation);
         p_tft->fillScreen(ILI9341_BLACK);
         Serial.println("initialized screen");
+
     }
+
+    if (!p_touch) {
+      p_touch = &touch;
+      p_touch->InitTouch();
+      p_touch->setPrecision(PREC_MEDIUM);
+    }
+
     _tft = p_tft;
-    
+    _touch = p_touch;    
 }
