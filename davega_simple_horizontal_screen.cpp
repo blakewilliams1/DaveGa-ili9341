@@ -28,18 +28,24 @@ void DavegaSimpleHorizontalScreen::reset() {
     _tft->fillScreen(ILI9341_BLACK);
 
     _tft->setTextColor(ILI9341_WHITE);
+    _tft->setCursor(274, 42);
     _tft->print(_config->imperial_units ? "TRIP MI" : "TRIP KM");
+    _tft->setCursor(266, 105);
     _tft->print(_config->imperial_units ? "TOTAL MI" : "TOTAL KM");
+    _tft->setCursor(258, 167);
     _tft->print("BATTERY V");
 
     switch (_primary_item) {
         case SCR_BATTERY_CURRENT:
+            _tft->setCursor(179, 167);
             _tft->print("BATTERY A");
             break;
         case SCR_MOTOR_CURRENT:
+            _tft->setCursor(193, 167);
             _tft->print("MOTOR A");
             break;
         default:
+            _tft->setCursor(180, 167);
             _tft->print(_config->imperial_units ? "MPH" : "KPH");
     }
 
@@ -108,6 +114,7 @@ void DavegaSimpleHorizontalScreen::_update_battery_indicator(float battery_perce
             uint16_t color = _tft->color565(red, green, 0);
             _tft->fillRect(x, 204, width, 35, color);
             if (!should_be_filled)
+                _tft->fillRect(x + 1, 205, width - 2, 33, ILI9341_BLACK);
         }
     }
     _battery_cells_filled = cells_to_fill;
