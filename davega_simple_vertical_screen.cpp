@@ -117,9 +117,18 @@ void DavegaSimpleVerticalScreen::_update_battery_indicator(float battery_percent
         bool is_filled = (i < _battery_cells_filled);
         bool should_be_filled = (i < cells_to_fill);
         if (should_be_filled != is_filled || redraw) {
-            int y = (cell_count - i - 1) * (height + space) + 15;
-            uint8_t green = (uint8_t)(255.0 / (cell_count - 1) * i);
-            uint8_t red = 255 - green;
+            int x = (cell_count - i - 1) * (width + space);
+            uint8_t red = 255;
+            if (i > cell_count/2) {
+              int curr_cell =  (int)cell_count/2;
+              red -= (255 / curr_cell) * (i - curr_cell);
+            }
+
+            uint8_t green = 255;
+            if (i < cell_count/2) {
+              int curr_cell =  (int)cell_count/2;
+              green -= (255 / curr_cell) * (curr_cell - i);
+            }
             uint16_t color = _tft->color565(red, green, 0);
             _tft->fillRect(207, y, 31, height, color);
             if (!should_be_filled)

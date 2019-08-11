@@ -125,8 +125,17 @@ void DavegaSimpleHorizontalScreen::_update_battery_indicator(float battery_perce
         bool should_be_filled = (i < cells_to_fill);
         if (should_be_filled != is_filled || redraw) {
             int x = (cell_count - i - 1) * (width + space);
-            uint8_t green = (uint8_t)(255.0 / (cell_count - 1) * i);
-            uint8_t red = 255 - green;
+            uint8_t red = 255;
+            if (i > cell_count/2) {
+              int curr_cell =  (int)cell_count/2;
+              red -= (255 / curr_cell) * (i - curr_cell);
+            }
+
+            uint8_t green = 255;
+            if (i < cell_count/2) {
+              int curr_cell =  (int)cell_count/2;
+              green -= (255 / curr_cell) * (curr_cell - i);
+            }
             uint16_t color = _tft->color565(red, green, 0);
             _tft->fillRect(x, 179, width, 35, color);
             if (!should_be_filled)
@@ -151,7 +160,7 @@ t_davega_touch_input DavegaSimpleHorizontalScreen::handleTouchInput() {
 
     boolean button_1_pressed = touch_x < 105 && touch_y >=190;
     boolean button_2_pressed = touch_x >= 105 && touch_x < 215 && touch_y >=190;
-    boolean button_3_pressed = true;//touch_x >= 215 && touch_y >=190;
+    boolean button_3_pressed = touch_x >= 215 && touch_y >=190;
 
     return {button_1_pressed, button_2_pressed, button_3_pressed};
   }
