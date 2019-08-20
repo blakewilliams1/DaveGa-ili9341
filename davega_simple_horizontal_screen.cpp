@@ -104,7 +104,7 @@ void DavegaSimpleHorizontalScreen::update(t_davega_data *data) {
         _tft->fillScreen(bg_color);
         _tft->setTextColor(ILI9341_BLACK);
         _tft->setCursor(7, 220);
-        _tft->print("test code");
+        _tft->print(vesc_fault_code_to_string(data->vesc_fault_code));
     } else {
       _update_battery_indicator(data->battery_percent, _just_reset);
     }
@@ -114,7 +114,7 @@ void DavegaSimpleHorizontalScreen::update(t_davega_data *data) {
     _just_reset = false;
 }
 
-void DavegaSimpleHorizontalScreen::_update_battery_indicator(float battery_percent, bool redraw = false) {
+void DavegaSimpleHorizontalScreen::_update_battery_indicator(float battery_percent, bool redraw) {
     float width = 25;
     float space = 4;
     float cell_count = 11;

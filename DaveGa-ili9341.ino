@@ -76,6 +76,14 @@ DavegaSimpleVerticalScreen davega_simple_vertical_screen_with_battery_current = 
 #include "davega_simple_vertical_screen.h"
 DavegaSimpleVerticalScreen davega_simple_vertical_screen_with_motor_current = DavegaSimpleVerticalScreen(SCR_MOTOR_CURRENT);
 #endif
+#ifdef REALTIME_STATS_SCREEN_ENABLED_WITH_MOTOR_CURRENT
+#include "davega_realtime_stat_screen.h"
+DavegaRealtimeStatScreen davega_realtime_stats_screen_motor_current = DavegaRealtimeStatScreen(SCR_MOTOR_CURRENT);
+#endif
+#ifdef REALTIME_STATS_SCREEN_ENABLED_WITH_SPEED
+#include "davega_realtime_stat_screen.h"
+DavegaRealtimeStatScreen davega_realtime_stats_screen_speed = DavegaRealtimeStatScreen(SCR_SPEED);
+#endif
 #ifdef TEXT_SCREEN_ENABLED
 #include "davega_text_screen.h"
 DavegaTextScreen davega_text_screen = DavegaTextScreen();
@@ -102,6 +110,12 @@ DavegaScreen* davega_screens[] = {
 #endif
 #ifdef SIMPLE_VERTICAL_SCREEN_WITH_MOTOR_CURRENT_ENABLED
     &davega_simple_vertical_screen_with_motor_current,
+#endif
+#ifdef REALTIME_STATS_SCREEN_ENABLED_WITH_MOTOR_CURRENT
+    &davega_realtime_stats_screen_motor_current,
+#endif
+#ifdef REALTIME_STATS_SCREEN_ENABLED_WITH_SPEED
+    &davega_realtime_stats_screen_speed,
 #endif
 #ifdef TEXT_SCREEN_ENABLED
     &davega_text_screen,

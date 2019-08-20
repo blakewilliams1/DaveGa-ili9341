@@ -138,7 +138,6 @@ void DavegaDefaultScreen::heartbeat(uint32_t duration_ms, bool successful_vesc_r
 }
 
 void DavegaDefaultScreen::_draw_labels() {
-   // _tft->setFont(&FreeSans9pt7b);
 
     _tft->setTextColor(ILI9341_WHITE);
     _tft->setCursor(36, 48);
