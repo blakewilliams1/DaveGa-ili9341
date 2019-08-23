@@ -20,7 +20,7 @@
 #ifndef DAVEGA_DEFAULT_SCREEN_H
 #define DAVEGA_DEFAULT_SCREEN_H
 
-#include "Adafruit_ILI9341.h"
+#include <ILI9341_t3.h> // Hardware-specific library
 #include "davega_ili9341_screen.h"
 #include "vesc_comm.h"
 
@@ -41,7 +41,7 @@ protected:
     vesc_comm_fault_code _last_fault_code = FAULT_CODE_NONE;
 
     void _draw_labels();
-    bool _draw_battery_cell(int index, bool filled, bool redraw = false);
+    void _draw_battery_cell(int index, bool filled, bool redraw = false);
     void _draw_speed_cell(int index, bool filled, bool redraw = false);
     void _update_battery_indicator(float battery_percent, bool redraw = false);
     void _update_speed_indicator(float speed_percent, bool redraw = false);

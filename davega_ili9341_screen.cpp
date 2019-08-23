@@ -19,24 +19,22 @@
 
 #include "davega_ili9341_screen.h"
 
-// For the Adafruit shield, these are the default.
-#define TFT_MISO 12
-#define TFT_RST 9
-#define TFT_DC  8
-#define TFT_CS  10
-#define TFT_MOSI 11
-#define TFT_CLK 13
+// pin 11 = MOSI, pin 12 = MISO, pin 13 = SCK.
 
-Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_MOSI, TFT_CLK, TFT_RST, TFT_MISO);
-Adafruit_ILI9341* p_tft = nullptr;
+#define TFT_DC  9
+#define TFT_CS 10
 
-#define TCLK 3
-#define TCS 4
-#define TDIN 5
-#define DOUT 6
-#define IRQ 7
 
-URTouch touch = URTouch(IRQ, DOUT, TDIN, TCS, TCLK);
+ILI9341_t3 tft = ILI9341_t3(TFT_CS, TFT_DC);
+ILI9341_t3* p_tft = nullptr;
+
+#define TCLK 19
+#define TCS 20
+#define TDIN 21
+#define DOUT 22
+#define IRQ 23
+
+URTouch touch(IRQ, DOUT, TDIN, TCS, TCLK);
 URTouch* p_touch = nullptr;
 
 void DavegaILI9341Screen::init(t_davega_screen_config *config) {

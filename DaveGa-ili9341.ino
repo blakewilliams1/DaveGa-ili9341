@@ -124,8 +124,10 @@ DavegaScreen* davega_screens[] = {
 
 t_screen_item text_screen_items[] = TEXT_SCREEN_ITEMS;
 
+char* versionNumber = "1.0";
 t_davega_screen_config screen_config = {
-    make_fw_version(FW_VERSION, REVISION_ID),
+    // TODO: fix issue with calling make_fw_version.
+    versionNumber,//make_fw_version(FW_VERSION, REVISION_ID),
     IMPERIAL_UNITS,
     USE_FAHRENHEIT,
     SHOW_AVG_CELL_VOLTAGE,
@@ -168,7 +170,7 @@ float erpm_to_kph(uint32_t erpm) {
 float voltage_to_percent(float voltage) {
     if (voltage < discharge_ticks[0])
         return 0.0;
-    for (int i = 1; i < LEN(discharge_ticks); i++) {
+    for (unsigned int i = 1; i < LEN(discharge_ticks); i++) {
         float cur_voltage = discharge_ticks[i];
         if (voltage < cur_voltage) {
             float prev_voltage = discharge_ticks[i - 1];
@@ -213,7 +215,7 @@ void setup() {
         eeprom_write_session_data(session_data);
     }
 
-    for (int i=0; i<LEN(davega_screens); i++)
+    for (unsigned int i=0; i < LEN(davega_screens); i++)
         davega_screens[i]->init(&screen_config);
     scr = davega_screens[current_screen_index];
 

@@ -20,9 +20,13 @@
 #ifndef DAVEGA_ILI9341_SCREEN_H
 #define DAVEGA_ILI9341_SCREEN_H
 
-#include "davega_screen.h"
-#include "Adafruit_ILI9341.h"
+#include <ILI9341_t3.h> // Hardware-specific library
+#include <SD.h>
+#include <SPI.h>
+#include <Time.h>
 #include <URTouch.h>
+#include <URTouchCD.h>
+#include "davega_screen.h"
 
 class DavegaILI9341Screen: public DavegaScreen {
 public:
@@ -30,7 +34,7 @@ public:
 
 protected:
 
-    Adafruit_ILI9341* _tft;
+    ILI9341_t3* _tft;
     URTouch* _touch;
 };
 

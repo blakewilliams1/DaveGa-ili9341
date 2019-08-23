@@ -22,9 +22,7 @@
 #include "davega_util.h"
 #include "vesc_comm.h"
 #include "tft_util.h"
-#include "Adafruit_ILI9341.h"
-//#include <Fonts/FreeSans9pt7b.h>
-//#include <Fonts/FreeSans12pt7b.h>
+#include <ILI9341_t3.h> // Hardware-specific library
 
 #define BATTERY_INDICATOR_CELL_WIDTH 14
 #define BATTERY_INDICATOR_CELL_HEIGHT 15
@@ -73,7 +71,6 @@ void DavegaDefaultScreen::reset() {
     _draw_labels();
 
     // draw FW version
-  //  _tft->setFont(&FreeSans9pt7b);
     _tft->setTextColor(ILI9341_WHITE);
     _tft->setCursor(40, 140);
     _tft->print(_config->fw_version);
@@ -167,7 +164,7 @@ void DavegaDefaultScreen::_draw_labels() {
     }
 }
 
-bool DavegaDefaultScreen::_draw_battery_cell(int index, bool filled, bool redraw = false) {
+void DavegaDefaultScreen::_draw_battery_cell(int index, bool filled, bool redraw) {
     uint16_t p_word = pgm_read_word_near(BATTERY_INDICATOR_CELLS + index);
     Point *p = (Point *) &p_word;
     if (filled || redraw) {
@@ -190,10 +187,10 @@ bool DavegaDefaultScreen::_draw_battery_cell(int index, bool filled, bool redraw
     }
 }
 
-void DavegaDefaultScreen::_update_battery_indicator(float battery_percent, bool redraw = false) {
+void DavegaDefaultScreen::_update_battery_indicator(float battery_percent, bool redraw) {
     int cells_to_fill = round(battery_percent * LEN(BATTERY_INDICATOR_CELLS));
     if (redraw) {
-        for (int i = 0; i < LEN(BATTERY_INDICATOR_CELLS); i++)
+        for (unsigned int i = 0; i < LEN(BATTERY_INDICATOR_CELLS); i++)
             _draw_battery_cell(i, i < cells_to_fill, true);
     }
     else {
@@ -209,7 +206,7 @@ void DavegaDefaultScreen::_update_battery_indicator(float battery_percent, bool 
     _battery_cells_filled = cells_to_fill;
 }
 
-void DavegaDefaultScreen::_draw_speed_cell(int index, bool filled, bool redraw = false) {
+void DavegaDefaultScreen::_draw_speed_cell(int index, bool filled, bool redraw) {
     uint16_t p_word = pgm_read_word_near(SPEED_INDICATOR_CELLS + index);
     Point *p = (Point *) &p_word;
     if (filled || redraw) {
@@ -228,10 +225,10 @@ void DavegaDefaultScreen::_draw_speed_cell(int index, bool filled, bool redraw =
     }
 }
 
-void DavegaDefaultScreen::_update_speed_indicator(float speed_percent, bool redraw = false) {
+void DavegaDefaultScreen::_update_speed_indicator(float speed_percent, bool redraw) {
     int cells_to_fill = round(speed_percent * LEN(SPEED_INDICATOR_CELLS));
     if (redraw) {
-        for (int i = 0; i < LEN(SPEED_INDICATOR_CELLS); i++)
+        for (unsigned int i = 0; i < LEN(SPEED_INDICATOR_CELLS); i++)
             _draw_speed_cell(i, i < cells_to_fill, true);
     }
     else {

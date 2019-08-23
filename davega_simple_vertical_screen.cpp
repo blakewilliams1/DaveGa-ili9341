@@ -22,9 +22,8 @@
 #include "davega_util.h"
 #include "vesc_comm.h"
 #include "tft_util.h"
-#include "Adafruit_ILI9341.h"
-//#include <Fonts/FreeSans9pt7b.h>
-//#include <Fonts/FreeSans12pt7b.h>
+#include <ILI9341_t3.h> // Hardware-specific library
+
 
 void DavegaSimpleVerticalScreen::reset() {
     _tft->fillScreen(ILI9341_BLACK);
@@ -107,7 +106,7 @@ void DavegaSimpleVerticalScreen::update(t_davega_data *data) {
     _just_reset = false;
 }
 
-void DavegaSimpleVerticalScreen::_update_battery_indicator(float battery_percent, bool redraw = false) {
+void DavegaSimpleVerticalScreen::_update_battery_indicator(float battery_percent, bool redraw) {
     int height = 13;
     int space = 3;
     int cell_count = 10;

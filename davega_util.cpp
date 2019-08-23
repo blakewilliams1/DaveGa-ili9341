@@ -22,7 +22,7 @@
 
 char fw_version_buffer[6];
 
-char* make_fw_version(const char* fw_version, const char* revision_id) {
+char* make_fw_version(char* fw_version, const char* revision_id) {
     if (fw_version[0] == 'v') {
         return fw_version;
     }
@@ -64,22 +64,30 @@ void format_total_distance(float total_distance, char* result) {
 }
 
 char* vesc_fault_code_to_string(vesc_comm_fault_code fault_code) {
+  char* value;
     switch (fault_code) {
         case FAULT_CODE_NONE:
-            return "FAULT CODE NONE";
+            value = "FAULT CODE NONE";
+            break;
         case FAULT_CODE_OVER_VOLTAGE:
-            return "OVER VOLTAGE";
+            value = "OVER VOLTAGE";
+            break;
         case FAULT_CODE_UNDER_VOLTAGE:
-            return "UNDER VOLTAGE";
+            value = "UNDER VOLTAGE";
+            break;
         case FAULT_CODE_DRV:
-            return "DRV FAULT";
+            value = "DRV FAULT";
+            break;
         case FAULT_CODE_ABS_OVER_CURRENT:
-            return "OVER CURRENT";
+            value = "OVER CURRENT";
+            break;
         case FAULT_CODE_OVER_TEMP_FET:
-            return "OVER TEMP FET";
+            value = "OVER TEMP FET";
+            break;
         case FAULT_CODE_OVER_TEMP_MOTOR:
-            return "OVER TEMP MOTOR";
-        default:
-            return "unexpected fault code";
+            value = "OVER TEMP MOTOR";
+            break;
+        default: value = "unexpected fault code";
     }
+    return value;
 }

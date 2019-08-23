@@ -22,9 +22,7 @@
 #include "davega_util.h"
 #include "vesc_comm.h"
 #include "tft_util.h"
-#include "Adafruit_ILI9341.h"
-//#include <Fonts/FreeSans9pt7b.h>
-//#include <Fonts/FreeSans12pt7b.h>
+#include <ILI9341_t3.h> // Hardware-specific library
 
 void DavegaTextScreen::reset() {
     _tft->fillScreen(ILI9341_BLACK);
@@ -125,21 +123,21 @@ void DavegaTextScreen::heartbeat(uint32_t duration_ms, bool successful_vesc_read
 }
 
 void DavegaTextScreen::_write_numeric_line(
-        float value, const char* units, const char* label, int lineno, uint16_t color = ILI9341_WHITE) {
+        float value, const char* units, const char* label, int lineno, uint16_t color) {
     for (int i=0; i < MAX_LINE_LENGTH; i++)
         _line_buffer[i] = ' ';
     dtostrf(value, 8, 2, _line_buffer);
     _line_buffer[8] = ' ';
-    for (int i=0; i<strlen(units); i++)
+    for (unsigned int i = 0; i < strlen(units); i++)
         _line_buffer[i+9] = units[i];
-    for (int i=0; i<strlen(label); i++)
+    for (unsigned int i = 0; i < strlen(label); i++)
         _line_buffer[i+13] = label[i];
     _line_buffer[MAX_LINE_LENGTH] = '\0';
 
     _write_line_buffer(lineno, color);
 }
 
-void DavegaTextScreen::_write_time_line(uint32_t seconds, const char* label, int lineno, uint16_t color = ILI9341_WHITE) {
+void DavegaTextScreen::_write_time_line(uint32_t seconds, const char* label, int lineno, uint16_t color) {
     for (int i=0; i < MAX_LINE_LENGTH; i++)
         _line_buffer[i] = ' ';
     uint32_t hours = seconds / 3600;
@@ -158,22 +156,22 @@ void DavegaTextScreen::_write_time_line(uint32_t seconds, const char* label, int
     }
 
     _line_buffer[9] = 'h';
-    for (int i=0; i<strlen(label); i++)
+    for (unsigned int i = 0; i < strlen(label); i++)
         _line_buffer[i+13] = label[i];
     _line_buffer[MAX_LINE_LENGTH] = '\0';
 
     _write_line_buffer(lineno, color);
 }
 
-void DavegaTextScreen::_write_text_line(char* value, int lineno, uint16_t color = ILI9341_WHITE) {
-    for (int i=0; i<strlen(value); i++)
+void DavegaTextScreen::_write_text_line(char* value, int lineno, uint16_t color) {
+    for (unsigned int i = 0; i < strlen(value); i++)
         _line_buffer[i] = value[i];
     _line_buffer[strlen(value)] = '\0';
 
     _write_line_buffer(lineno, color);
 }
 
-void DavegaTextScreen::_write_line_buffer(int lineno, uint16_t color = ILI9341_WHITE) {
+void DavegaTextScreen::_write_line_buffer(int lineno, uint16_t color) {
   int line_length = strlen(_line_buffer);
     // space padding
     for (int i=strlen(_line_buffer); i < MAX_LINE_LENGTH; i++)

@@ -19,7 +19,8 @@
 
 #include "davega_simple_screen.h"
 #include "davega_util.h"
-#include "Adafruit_ILI9341.h"
+#include <ILI9341_t3.h> // Hardware-specific library
+
 
 uint16_t primary_item_color(t_screen_item screen_item, t_davega_data* data, t_davega_screen_config* config) {
     uint16_t color = ILI9341_WHITE;

@@ -22,7 +22,7 @@
 #include "davega_util.h"
 #include "vesc_comm.h"
 #include "tft_util.h"
-#include "Adafruit_ILI9341.h"
+#include <ILI9341_t3.h> // Hardware-specific library
 
 void DavegaSimpleHorizontalScreen::reset() {
     _tft->fillScreen(ILI9341_BLACK);

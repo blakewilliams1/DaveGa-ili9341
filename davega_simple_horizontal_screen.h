@@ -20,8 +20,7 @@
 #ifndef DAVEGA_SIMPLE_HORIZONTAL_SCREEN_H
 #define DAVEGA_SIMPLE_HORIZONTAL_SCREEN_H
 
-#include <Adafruit_ILI9341.h>
-#include "Adafruit_GFX.h"
+#include "ILI9341_t3.h" // Hardware-specific library
 #include "davega_ili9341_screen.h"
 #include "davega_simple_screen.h"
 
