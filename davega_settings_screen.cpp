@@ -27,7 +27,71 @@
 void DavegaSettingsScreen::reset() {
   _tft->fillScreen(ILI9341_BLACK);
 
-  // TODO: draw settings buttons
+  // Temp units
+  _tft->setTextColor(ILI9341_WHITE);
+  _tft->setCursor(15, 20);
+  _tft->print(_config->use_fahrenheit ? "Fahrenheit" : "Celcius");
+  _tft->fillRect(20, 35, 60, 40, ILI9341_WHITE); 
+  _tft->setTextColor(ILI9341_BLACK);
+  _tft->setCursor(35, 45);
+  _tft->print("Temp");
+  _tft->setCursor(33, 55);
+  _tft->print("Units");
+
+  // Other units
+  _tft->setTextColor(ILI9341_WHITE);
+  _tft->setCursor(100, 20);
+  _tft->print(_config->use_fahrenheit ? "Imperial" : "Metric");
+  _tft->fillRect(100, 35, 60, 40, ILI9341_WHITE); 
+  _tft->setTextColor(ILI9341_BLACK);
+  _tft->setCursor(110, 45);
+  _tft->print("Other");
+  _tft->setCursor(112, 55);
+  _tft->print("Units");
+
+
+  // Misc read-only settings
+  _tft->setTextColor(ILI9341_WHITE);
+  _tft->setCursor(215, 15);
+  _tft->print("Other Settings");
+  _tft->setCursor(245, 25);
+  _tft->print("something");
+
+  // Navigation label
+  _tft->setCursor(15, 100);
+  _tft->print("Navigation");
+
+  // Simple horizontal screen navigation
+  _tft->fillRect(simple_horizontal_coords.x, simple_horizontal_coords.y, 80, 40, ILI9341_WHITE); 
+  _tft->setTextColor(ILI9341_BLACK);
+  _tft->setCursor(simple_horizontal_coords.x + 5, simple_horizontal_coords.y + 10);
+  _tft->print("Simple");
+  _tft->setCursor(simple_horizontal_coords.x + 5, simple_horizontal_coords.y + 20);
+  _tft->print("Horizontal");
+
+  // Simple vertical screen navigation
+  _tft->fillRect(simple_vertical_coords.x, simple_vertical_coords.y, 80, 40, ILI9341_WHITE); 
+  _tft->setTextColor(ILI9341_BLACK);
+  _tft->setCursor(simple_vertical_coords.x + 5, simple_vertical_coords.y + 10);
+  _tft->print("Simple");
+  _tft->setCursor(simple_vertical_coords.x + 5, simple_vertical_coords.y + 20);
+  _tft->print("Vertical");
+
+  // Realtime graph screen navigation
+  _tft->fillRect(realtime_graph_coords.x, realtime_graph_coords.y, 80, 40, ILI9341_WHITE); 
+  _tft->setTextColor(ILI9341_BLACK);
+  _tft->setCursor(realtime_graph_coords.x + 5, realtime_graph_coords.y + 10);
+  _tft->print("Realtime");
+  _tft->setCursor(realtime_graph_coords.x + 5, realtime_graph_coords.y + 20);
+  _tft->print("Graph");
+
+  // Default screen navigation
+  _tft->fillRect(default_screen_coords.x, default_screen_coords.y, 80, 40, ILI9341_WHITE); 
+  _tft->setTextColor(ILI9341_BLACK);
+  _tft->setCursor(default_screen_coords.x + 5, default_screen_coords.y + 10);
+  _tft->print("Default");
+  _tft->setCursor(default_screen_coords.x + 5, default_screen_coords.y + 20);
+  _tft->print("Screen");
 
   // FW version
   _tft->setCursor(5, 230);
@@ -78,7 +142,48 @@ t_davega_touch_input DavegaSettingsScreen::handleTouchInput() {
     int touch_x = _touch->getX();
     int touch_y = _touch->getY();
 
-    // TODO process touch input.
+    // TODO process more touch input.
+    // Toggle temp units.
+    if (touch_x < 80 && touch_y < 80) {
+      
+    }
+
+    // Toggle other units.
+    if (touch_x >= 80 && touch_x < 160 && touch_y < 80) {
+      
+    }
+
+    // Location of simple horizontal button with 5px margin.
+    if (touch_x > simple_horizontal_coords.x - 5 &&
+        touch_x < simple_horizontal_coords.x + 85 &&
+        touch_y < simple_horizontal_coords.y - 5 &&
+        touch_y < simple_horizontal_coords.y + 45) {
+      
+    }
+
+    // Location of simple vertical button with 5px margin.
+    if (touch_x > simple_vertical_coords.x - 5 &&
+        touch_x < simple_vertical_coords.x + 85 &&
+        touch_y < simple_vertical_coords.y - 5 &&
+        touch_y < simple_vertical_coords.y + 45) {
+      
+    }
+
+    // Location of realtime graph button with 5px margin.
+    if (touch_x > realtime_graph_coords.x - 5 &&
+        touch_x < realtime_graph_coords.x + 85 &&
+        touch_y < realtime_graph_coords.y - 5 &&
+        touch_y < realtime_graph_coords.y + 45) {
+      
+    }
+
+    // Location of default screen button with 5px margin.
+    if (touch_x > default_screen_coords.x - 5 &&
+        touch_x < default_screen_coords.x + 85 &&
+        touch_y < default_screen_coords.y - 5 &&
+        touch_y < default_screen_coords.y + 45) {
+      
+    }
 
     return {};
   }

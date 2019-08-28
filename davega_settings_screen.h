@@ -24,6 +24,10 @@
 #include "davega_ili9341_screen.h"
 #include "davega_simple_screen.h"
 
+struct Point {
+  short x, y;
+};
+
 class DavegaSettingsScreen: public DavegaILI9341Screen {
 public:
     DavegaSettingsScreen() {    }
@@ -36,6 +40,10 @@ public:
 protected:
     // Have we just reset the screen? Unset by the first update() call.
     bool _just_reset = false;
+    Point simple_horizontal_coords = {20, 115};
+    Point simple_vertical_coords = {135, 115};
+    Point realtime_graph_coords = {20, 175};
+    Point default_screen_coords = {135, 175};
 
     vesc_comm_fault_code _last_fault_code = FAULT_CODE_NONE;
 
