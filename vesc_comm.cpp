@@ -27,7 +27,7 @@
 SoftwareSerial vesc_serial(13, 14); // RX, TX
 #else
 #define D(x)
-usb_serial_class &vesc_serial = Serial;
+HardwareSerial &vesc_serial = Serial1;
 #endif
 
 #define PACKET_GET_VALUES_TYPE 4

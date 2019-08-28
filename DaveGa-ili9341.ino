@@ -48,6 +48,10 @@ VescCommUnity vesc_comm = VescCommUnity();
 VescCommStandard vesc_comm = VescCommStandard();
 #endif
 
+#ifdef SETTINGS_SCREEN_ENABLED
+#include "davega_default_screen.h"
+DavegaSettingsScreen davega_settings_screen = DavegaSettingsScreen();
+#endif
 #ifdef DEFAULT_SCREEN_ENABLED
 #include "davega_default_screen.h"
 DavegaDefaultScreen davega_default_screen = DavegaDefaultScreen();
@@ -90,6 +94,9 @@ DavegaTextScreen davega_text_screen = DavegaTextScreen();
 #endif
 
 DavegaScreen* davega_screens[] = {
+#ifdef SETTINGS_SCREEN_ENABLED
+    &davega_settings_screen,
+#endif
 #ifdef DEFAULT_SCREEN_ENABLED
     &davega_default_screen,
 #endif
