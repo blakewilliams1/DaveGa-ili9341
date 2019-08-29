@@ -185,6 +185,6 @@ void DavegaTextScreen::_write_line_buffer(int lineno, uint16_t color) {
     _tft->print(_line_buffer);
 }
 
-t_davega_touch_input DavegaTextScreen::handleTouchInput() {
-  return {};
+uint8_t DavegaTextScreen::handleTouchInput(t_davega_button_input* input) {
+  return 0;
 }

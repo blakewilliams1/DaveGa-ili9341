@@ -25,7 +25,7 @@
 #include "davega_simple_screen.h"
 
 struct Point {
-  short x, y;
+  short x, y, width, height;
 };
 
 class DavegaSettingsScreen: public DavegaILI9341Screen {
@@ -35,15 +35,18 @@ public:
     void reset();
     void update(t_davega_data* data);
     void heartbeat(uint32_t duration_ms, bool successful_vesc_read);
-    t_davega_touch_input handleTouchInput();
+    uint8_t handleTouchInput(t_davega_button_input* input);
 
 protected:
+    int primary_options[3] = {SCR_MOTOR_CURRENT, SCR_BATTERY_CURRENT, SCR_SPEED};
+    uint8_t _primary_options_index = 0;
     // Have we just reset the screen? Unset by the first update() call.
     bool _just_reset = false;
-    Point simple_horizontal_coords = {20, 115};
-    Point simple_vertical_coords = {135, 115};
-    Point realtime_graph_coords = {20, 175};
-    Point default_screen_coords = {135, 175};
+    Point simple_horizontal_coords = {20, 115, 70, 40};
+    Point simple_vertical_coords = {120, 115, 70, 40};
+    Point text_screen_coords = {220, 115, 70, 40};
+    Point realtime_graph_coords = {20, 175, 70, 40};
+    Point default_screen_coords = {120, 175, 70, 40};
 
     vesc_comm_fault_code _last_fault_code = FAULT_CODE_NONE;
 

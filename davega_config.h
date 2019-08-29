@@ -125,13 +125,12 @@
 #define COUNTER_RESET_TIME 3000  // ms
 
 // This corresponds (more or less) to how often data is read from VESC.
-#define UPDATE_DELAY 50  // ms
 
 // 0=portrait, 1=right rotated landscape, 2=reverse portrait, 3=left rotated landscape
 #define SCREEN_ORIENTATION 1
 
 // Screens. Uncomment the ones you want enabled.
-#define DEFAULT_SETTINGS_ENABLED 1
+//#define SETTINGS_SCREEN_ENABLED 1
 //#define DEFAULT_SCREEN_ENABLED 1
 #define SIMPLE_HORIZONTAL_SCREEN_ENABLED 1
 //#define SIMPLE_HORIZONTAL_SCREEN_WITH_BATTERY_CURRENT_ENABLED 1
@@ -139,9 +138,9 @@
 //#define SIMPLE_VERTICAL_SCREEN_ENABLED 1
 //#define SIMPLE_VERTICAL_SCREEN_WITH_BATTERY_CURRENT_ENABLED 1
 //#define SIMPLE_VERTICAL_SCREEN_WITH_MOTOR_CURRENT_ENABLED 1
-#define TEXT_SCREEN_ENABLED 1
-#define REALTIME_STATS_SCREEN_ENABLED_WITH_MOTOR_CURRENT 1
+//#define REALTIME_STATS_SCREEN_ENABLED_WITH_MOTOR_CURRENT 1
 //#define REALTIME_STATS_SCREEN_ENABLED_WITH_SPEED 1
+//#define TEXT_SCREEN_ENABLED 1
 
 // Information to be displayed on the text screen. Only relevant if TEXT_SCREEN_ENABLED is set.
 // Available options:

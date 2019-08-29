@@ -20,6 +20,7 @@
 #include "davega_settings_screen.h"
 #include "davega_screen.h"
 #include "davega_util.h"
+#include "davega_config.h"
 #include "vesc_comm.h"
 #include "tft_util.h"
 #include <ILI9341_t3.h> // Hardware-specific library
@@ -29,7 +30,7 @@ void DavegaSettingsScreen::reset() {
 
   // Temp units
   _tft->setTextColor(ILI9341_WHITE);
-  _tft->setCursor(15, 20);
+  _tft->setCursor(20, 20);
   _tft->print(_config->use_fahrenheit ? "Fahrenheit" : "Celcius");
   _tft->fillRect(20, 35, 60, 40, ILI9341_WHITE); 
   _tft->setTextColor(ILI9341_BLACK);
@@ -49,20 +50,41 @@ void DavegaSettingsScreen::reset() {
   _tft->setCursor(112, 55);
   _tft->print("Units");
 
-
-  // Misc read-only settings
+  // Primary menu item
   _tft->setTextColor(ILI9341_WHITE);
-  _tft->setCursor(215, 15);
-  _tft->print("Other Settings");
-  _tft->setCursor(245, 25);
-  _tft->print("something");
+  _tft->setCursor(185, 20);
+  char* primary_item_label;
+  switch(primary_options[_primary_options_index]) {
+    case SCR_MOTOR_CURRENT:
+      primary_item_label = "Motor Current";
+      break;
+    case SCR_BATTERY_CURRENT:
+      primary_item_label = "Bat Current";
+      break;
+    case SCR_SPEED:
+      primary_item_label = "Speed";
+      break;
+    default: "?";
+  }
+  _tft->print(primary_item_label);
+  _tft->fillRect(185, 35, 60, 40, ILI9341_WHITE); 
+  _tft->setTextColor(ILI9341_BLACK);
+  _tft->setCursor(195, 45);
+  _tft->print("Primary");
+  _tft->setCursor(197, 55);
+  _tft->print("Element");
 
   // Navigation label
+  _tft->setTextColor(ILI9341_WHITE);
   _tft->setCursor(15, 100);
   _tft->print("Navigation");
 
   // Simple horizontal screen navigation
-  _tft->fillRect(simple_horizontal_coords.x, simple_horizontal_coords.y, 80, 40, ILI9341_WHITE); 
+  _tft->fillRect(
+    simple_horizontal_coords.x,
+    simple_horizontal_coords.y,
+    simple_horizontal_coords.width,
+    simple_horizontal_coords.height, ILI9341_WHITE); 
   _tft->setTextColor(ILI9341_BLACK);
   _tft->setCursor(simple_horizontal_coords.x + 5, simple_horizontal_coords.y + 10);
   _tft->print("Simple");
@@ -70,15 +92,35 @@ void DavegaSettingsScreen::reset() {
   _tft->print("Horizontal");
 
   // Simple vertical screen navigation
-  _tft->fillRect(simple_vertical_coords.x, simple_vertical_coords.y, 80, 40, ILI9341_WHITE); 
+  _tft->fillRect(
+    simple_vertical_coords.x,
+    simple_vertical_coords.y,
+    simple_vertical_coords.width,
+    simple_vertical_coords.height, ILI9341_WHITE); 
   _tft->setTextColor(ILI9341_BLACK);
   _tft->setCursor(simple_vertical_coords.x + 5, simple_vertical_coords.y + 10);
   _tft->print("Simple");
   _tft->setCursor(simple_vertical_coords.x + 5, simple_vertical_coords.y + 20);
   _tft->print("Vertical");
 
+  // Text screen navigation
+  _tft->fillRect(
+    text_screen_coords.x,
+    text_screen_coords.y,
+    text_screen_coords.width,
+    text_screen_coords.height, ILI9341_WHITE); 
+  _tft->setTextColor(ILI9341_BLACK);
+  _tft->setCursor(text_screen_coords.x + 5, text_screen_coords.y + 10);
+  _tft->print("Text");
+  _tft->setCursor(text_screen_coords.x + 5, text_screen_coords.y + 20);
+  _tft->print("Screen");
+
   // Realtime graph screen navigation
-  _tft->fillRect(realtime_graph_coords.x, realtime_graph_coords.y, 80, 40, ILI9341_WHITE); 
+  _tft->fillRect(
+    realtime_graph_coords.x,
+    realtime_graph_coords.y,
+    realtime_graph_coords.width,
+    realtime_graph_coords.height, ILI9341_WHITE); 
   _tft->setTextColor(ILI9341_BLACK);
   _tft->setCursor(realtime_graph_coords.x + 5, realtime_graph_coords.y + 10);
   _tft->print("Realtime");
@@ -86,7 +128,11 @@ void DavegaSettingsScreen::reset() {
   _tft->print("Graph");
 
   // Default screen navigation
-  _tft->fillRect(default_screen_coords.x, default_screen_coords.y, 80, 40, ILI9341_WHITE); 
+  _tft->fillRect(
+    default_screen_coords.x,
+    default_screen_coords.y,
+    default_screen_coords.width,
+    default_screen_coords.height, ILI9341_WHITE); 
   _tft->setTextColor(ILI9341_BLACK);
   _tft->setCursor(default_screen_coords.x + 5, default_screen_coords.y + 10);
   _tft->print("Default");
@@ -106,7 +152,6 @@ void DavegaSettingsScreen::update(t_davega_data *data) {
   if (data->vesc_fault_code != _last_fault_code)
     reset();
 
- 
 
   // warning
   if (data->vesc_fault_code != FAULT_CODE_NONE) {
@@ -136,57 +181,63 @@ void DavegaSettingsScreen::heartbeat(uint32_t duration_ms, bool successful_vesc_
   _tft->fillRect(50, 230, 6, 6, ILI9341_BLACK);
 }
 
-t_davega_touch_input DavegaSettingsScreen::handleTouchInput() {
-  if (_touch->dataAvailable()) {
-    _touch->read();
-    int touch_x = _touch->getX();
-    int touch_y = _touch->getY();
-
-    // TODO process more touch input.
-    // Toggle temp units.
-    if (touch_x < 80 && touch_y < 80) {
-      
-    }
-
-    // Toggle other units.
-    if (touch_x >= 80 && touch_x < 160 && touch_y < 80) {
-      
-    }
-
-    // Location of simple horizontal button with 5px margin.
-    if (touch_x > simple_horizontal_coords.x - 5 &&
-        touch_x < simple_horizontal_coords.x + 85 &&
-        touch_y < simple_horizontal_coords.y - 5 &&
-        touch_y < simple_horizontal_coords.y + 45) {
-      
-    }
-
-    // Location of simple vertical button with 5px margin.
-    if (touch_x > simple_vertical_coords.x - 5 &&
-        touch_x < simple_vertical_coords.x + 85 &&
-        touch_y < simple_vertical_coords.y - 5 &&
-        touch_y < simple_vertical_coords.y + 45) {
-      
-    }
-
-    // Location of realtime graph button with 5px margin.
-    if (touch_x > realtime_graph_coords.x - 5 &&
-        touch_x < realtime_graph_coords.x + 85 &&
-        touch_y < realtime_graph_coords.y - 5 &&
-        touch_y < realtime_graph_coords.y + 45) {
-      
-    }
-
-    // Location of default screen button with 5px margin.
-    if (touch_x > default_screen_coords.x - 5 &&
-        touch_x < default_screen_coords.x + 85 &&
-        touch_y < default_screen_coords.y - 5 &&
-        touch_y < default_screen_coords.y + 45) {
-      
-    }
-
-    return {};
+uint8_t DavegaSettingsScreen::handleTouchInput(t_davega_button_input* input) {
+  // TODO process more touch input.
+  // Toggle temp units.
+  if (input->touch_x < 80 && input->touch_y < 80) {
+    _config->use_fahrenheit = !_config->use_fahrenheit;
   }
 
-  return {false, false, false};
+  // Toggle other units.
+  if (input->touch_x >= 80 && input->touch_x < 160 && input->touch_y < 80) {
+    _config->imperial_units = !_config->imperial_units;
+  }
+
+  // Increment primary element choice.
+  if (input->touch_x >= 160 && input->touch_x < 240 && input->touch_y < 80) {
+    _primary_options_index++;
+    if (_primary_options_index > 2) _primary_options_index = 0;
+  }
+
+  // Location of simple horizontal button with 5px margin.
+  if (input->touch_x > simple_horizontal_coords.x - 5 &&
+      input->touch_x < simple_horizontal_coords.x + 85 &&
+      input->touch_y < simple_horizontal_coords.y - 5 &&
+      input->touch_y < simple_horizontal_coords.y + 45) {
+    #ifdef SIMPLE_HORIZONTAL_SCREEN_ENABLED
+    return SIMPLE_HORIZONTAL_SCREEN_ENABLED;
+    #endif
+  }
+
+  // Location of simple vertical button with 5px margin.
+  if (input->touch_x > simple_vertical_coords.x - 5 &&
+      input->touch_x < simple_vertical_coords.x + 85 &&
+      input->touch_y < simple_vertical_coords.y - 5 &&
+      input->touch_y < simple_vertical_coords.y + 45) {
+    #ifdef SIMPLE_VERTICAL_SCREEN_ENABLED
+    return SIMPLE_VERTICAL_SCREEN_ENABLED;
+    #endif
+  }
+
+  // Location of realtime graph button with 5px margin.
+  if (input->touch_x > realtime_graph_coords.x - 5 &&
+      input->touch_x < realtime_graph_coords.x + 85 &&
+      input->touch_y < realtime_graph_coords.y - 5 &&
+      input->touch_y < realtime_graph_coords.y + 45) {
+    #ifdef REALTIME_STATS_SCREEN_ENABLED_WITH_SPEED
+    return REALTIME_STATS_SCREEN_ENABLED_WITH_SPEED;
+    #endif
+  }
+
+  // Location of default screen button with 5px margin.
+  if (input->touch_x > default_screen_coords.x - 5 &&
+      input->touch_x < default_screen_coords.x + 85 &&
+      input->touch_y < default_screen_coords.y - 5 &&
+      input->touch_y < default_screen_coords.y + 45) {
+    #ifdef DEFAULT_SCREEN_ENABLED
+    return DEFAULT_SCREEN_ENABLED;
+    #endif
+  }
+
+  return 0;
 }

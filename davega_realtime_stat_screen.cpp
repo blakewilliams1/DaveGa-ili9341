@@ -22,7 +22,7 @@
 #include "davega_util.h"
 #include "vesc_comm.h"
 #include "tft_util.h"
-#include "Adafruit_ILI9341.h"
+#include <ILI9341_t3.h> // Hardware-specific library
 
 void DavegaRealtimeStatScreen::reset() {
   _tft->fillScreen(ILI9341_BLACK);
@@ -50,9 +50,9 @@ void DavegaRealtimeStatScreen::reset() {
 
   // Draw buttons
   /*_tft->fillRect(200, 220, 100, 15, ILI9341_WHITE);
-  _tft->setTextColor(ILI9341_BLACK);
-  _tft->setCursor(210, 223);
-  _tft->print("Change graph");*/
+    _tft->setTextColor(ILI9341_BLACK);
+    _tft->setCursor(210, 223);
+    _tft->print("Change graph");*/
 
   _just_reset = true;
 }
@@ -61,48 +61,61 @@ void DavegaRealtimeStatScreen::update(t_davega_data *data) {
   char fmt[10];
 
   if (data->vesc_fault_code != _last_fault_code)
-      reset();
+    reset();
 
   int y_axis = (_max_y_value * 220) / (_max_y_value - _min_y_value);
-  for (int i = 0; i < 5; i++) {
-    t_screen_item curr_item = graph_items[i];
-    float item_value = _get_item_value(data, curr_item);
+  float item_value = 0;
+  short prev_value = 0;
+    // Y coords derived from affine transformations.
+  if (use_speed) {
+    item_value = convert_speed(data->speed_kph, _config->imperial_units);
+    prev_value = _x_position > 0 ? graph_lines[_x_position - 1][0] / 100 : 0;
+    graph_lines[_x_position][0] =  (short)item_value * 100;
+    int curr_y_coord = ((item_value - _min_y_value) * -220) / (_max_y_value - _min_y_value) + 220;
+    int prev_y_coord = ((prev_value - _min_y_value) * -220) / (_max_y_value - _min_y_value) + 220;
+    _tft->drawLine(_x_position + 15, curr_y_coord, _x_position + 14, prev_y_coord, ILI9341_RED);
 
-    /*_tft->fillRect(90, 110, 50, 40, ILI9341_BLACK);
-    _tft->setCursor(100, 125);
-    _tft->setTextColor(ILI9341_WHITE);
-    _tft->print(item_value);*/
-
-    // Track min/max values, redraw on change.
-    if (item_value > _max_y_value) {
-      _max_y_value = item_value;
-      // reset();
-    }
-    if (item_value < _min_y_value) {
-      _min_y_value = item_value;
-    //  reset();
-    }
-
-    int color = _graph_colors[i];
-    // Y coord is derived from an affine transformation.
-    int y_coord = ((item_value - _min_y_value) * -200) / (_max_y_value - _min_y_value) + 200;
-
-    // Don't draw pixel if it's going to mar the min/max values, or over UI.
-    if ((_x_position < 245 || y_coord > 30) && y_coord != y_axis && y_coord <= 220 ) {
-      _tft->drawPixel(_x_position + 15, y_coord, ILI9341_RED);
-      _tft->drawPixel(_x_position + 15, y_coord, ILI9341_RED);
+   // DEBUG
+    if (_x_position > 0) {
+      _tft->fillRect(90, 110, 50, 55, ILI9341_BLUE);
+      _tft->setTextColor(ILI9341_WHITE);
+      _tft->setCursor(95, 115);
+      _tft->print(item_value);
+      _tft->setCursor(95, 130);
+      _tft->print(graph_lines[_x_position - 1][0]);
     }
   }
+  /*if (use_motor_current) {
+    item_value = data->motor_amps;
+    prev_value = graph_lines[_x_position - 1][1] / 100;
+    graph_lines[_x_position][1] = (int16_t)(item_value * 100);
+    int curr_y_coord = ((item_value - _min_y_value) * -200) / (_max_y_value - _min_y_value) + 200;
+    int prev_y_coord = ((prev_value - _min_y_value) * -200) / (_max_y_value - _min_y_value) + 200;
+    _tft->drawLine(_x_position + 15, curr_y_coord, _x_position + 14, prev_y_coord, ILI9341_GREEN);
+  }
+  if (use_duty_cycle) {
+    item_value = data->duty_cycle * 100.0f;
+    prev_value = graph_lines[_x_position - 1][2] / 100;
+    graph_lines[_x_position][2] = (int16_t)(item_value * 100);
+    int curr_y_coord = ((item_value - _min_y_value) * -200) / (_max_y_value - _min_y_value) + 200;
+    int prev_y_coord = ((prev_value - _min_y_value) * -200) / (_max_y_value - _min_y_value) + 200;
+    _tft->drawLine(_x_position + 15, curr_y_coord, _x_position + 14, prev_y_coord, ILI9341_BLUE);
+  }*/
+
+
+  // Clean upcoming graph space and remove past wipe's graph lines
+  _tft->drawLine(_x_position + 1, 0, _x_position + 1, y_axis - 1, ILI9341_BLACK);
+  _tft->drawLine(_x_position + 1, y_axis + 1, _x_position + 1, 220, ILI9341_BLACK);
 
   _x_position++;
-  if (_x_position > 305) _x_position = 0;
+  if (_x_position >= 305) _x_position = 0;
 
   // warning
   if (data->vesc_fault_code != FAULT_CODE_NONE) {
-      _tft->fillScreen(ILI9341_RED);
-      _tft->setTextColor(ILI9341_BLACK);
-      _tft->setCursor(7, 220);
-      _tft->print(vesc_fault_code_to_string(data->vesc_fault_code));
+    _tft->fillScreen(ILI9341_RED);
+    _tft->setTextColor(ILI9341_BLACK);
+    _tft->setCursor(7, 220);
+    _tft->print(vesc_fault_code_to_string(data->vesc_fault_code));
   } else {
     _update_battery_indicator(data->battery_percent, _just_reset);
   }
@@ -112,26 +125,17 @@ void DavegaRealtimeStatScreen::update(t_davega_data *data) {
 }
 
 float DavegaRealtimeStatScreen::_get_item_value(t_davega_data* data, t_screen_item item) {
-  // TODO: Remove when done testing
-  //return ((float)random(0, 3000) / 100.0f) - 15.0f;
-  float avg_speed_kph = 0;
   switch (item) {
     case SCR_MOSFET_TEMPERATURE:
       return convert_temperature(data->mosfet_celsius, _config->use_fahrenheit);
     case SCR_MOTOR_TEMPERATURE:
       return convert_temperature(data->motor_celsius, _config->use_fahrenheit);
-    case SCR_MOTOR_CURRENT:
-      return data->motor_amps;
     case SCR_BATTERY_CURRENT:
       return data->battery_amps;
-    case SCR_DUTY_CYCLE:
-      return data->duty_cycle * 100.0f;
     case SCR_TOTAL_VOLTAGE:
       return data->voltage;
     case SCR_BATTERY_CAPACITY_PERCENT:
       return data->battery_percent * 100.0f;
-    case SCR_SPEED:
-      return convert_distance(data->speed_kph, _config->imperial_units);
     default: break;
   }
 
@@ -139,31 +143,19 @@ float DavegaRealtimeStatScreen::_get_item_value(t_davega_data* data, t_screen_it
 }
 
 void DavegaRealtimeStatScreen::_update_battery_indicator(float battery_percent, bool redraw) {
-    _tft->setTextColor(ILI9341_BLACK);
-    _tft->setCursor(170, 230);
-    _tft->print(String(battery_percent) + "%");
-    // TODO make cool battery icon.
+  _tft->setTextColor(ILI9341_BLACK);
+  _tft->setCursor(170, 230);
+  _tft->print(String(battery_percent) + "%");
+  // TODO make cool battery icon.
 }
 
 void DavegaRealtimeStatScreen::heartbeat(uint32_t duration_ms, bool successful_vesc_read) {
-    uint16_t color = successful_vesc_read ? ILI9341_GREEN : ILI9341_RED;
-    _tft->fillRect(50, 230, 6, 6, color);
-    delay(duration_ms);
-    _tft->fillRect(50, 230, 6, 6, ILI9341_BLACK);
-   _x_position++;
-   if (_x_position >= 305){ _x_position = 0;}
+  uint16_t color = successful_vesc_read ? ILI9341_GREEN : ILI9341_RED;
+  _tft->fillRect(50, 230, 6, 6, color);
+  delay(duration_ms);
+  _tft->fillRect(50, 230, 6, 6, ILI9341_BLACK);
 }
 
-t_davega_touch_input DavegaRealtimeStatScreen::handleTouchInput() {
-  if (_touch->dataAvailable()) {
-    _touch->read();
-    int touch_x = _touch->getX();
-    int touch_y = _touch->getY();
-
-    // TODO process touch input.
-
-    return {};
-  }
-
-  return {false, false, false};
+uint8_t DavegaRealtimeStatScreen::handleTouchInput(t_davega_button_input* input) {
+  return 0;
 }

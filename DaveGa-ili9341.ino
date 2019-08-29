@@ -23,6 +23,8 @@
 #include "davega_util.h"
 #include "davega_screen.h"
 #include "vesc_comm.h"
+#include <URTouch.h>
+#include <URTouchCD.h>
 
 #define REVISION_ID "$Id: ca658c2601bcf00dee70bada1de15351e591c9a4 $"
 #define FW_VERSION "master"
@@ -168,6 +170,13 @@ int32_t rotations_to_meters(int32_t rotations) {
     float gear_ratio = float(WHEEL_PULLEY_TEETH) / float(MOTOR_PULLEY_TEETH);
     return (rotations / MOTOR_POLE_PAIRS / gear_ratio) * WHEEL_DIAMETER_MM * PI / 1000;
 }
+#define TCLK 19
+#define TCS 20
+#define TDIN 21
+#define DOUT 22
+#define IRQ 23
+
+URTouch touch_screen(IRQ, DOUT, TDIN, TCS, TCLK);
 
 float erpm_to_kph(uint32_t erpm) {
     float km_per_minute = rotations_to_meters(erpm) / 1000.0;
@@ -276,23 +285,53 @@ void setup() {
     int32_t tachometer = rotations_to_meters(vesc_comm.get_tachometer() / 6);
     initial_trip_meters -= tachometer;
     initial_total_meters -= tachometer;
+
+    touch_screen.InitTouch();
+    touch_screen.setPrecision(PREC_MEDIUM);
 }
 
 void loop() {
-    // Process current screen's touch input and hardware button input.
-    t_davega_touch_input touch_state = scr->handleTouchInput();
-    if (digitalRead(BUTTON_3_PIN) == LOW || touch_state.button_3_pressed) {
+    bool button_1_pressed = false;
+    bool button_2_pressed = false;
+    bool button_3_pressed = false;
+    if (digitalRead(BUTTON_3_PIN) == LOW) {
+        button_3_pressed = true;
         current_screen_index = (current_screen_index + 1) % LEN(davega_screens);
         scr = davega_screens[current_screen_index];
         scr->reset();
         delay(UPDATE_DELAY);
     }
 
-    if (digitalRead(BUTTON_1_PIN) == HIGH)
+    if (digitalRead(BUTTON_1_PIN) == HIGH) {
+        button_1_pressed = true;
         button_1_last_up_time = millis();
+    }
 
-    if (digitalRead(BUTTON_2_PIN) == HIGH)
+    if (digitalRead(BUTTON_2_PIN) == HIGH) {
+        button_2_pressed = true;
         button_2_last_up_time = millis();
+    }
+
+    int touch_x = 0;
+    int touch_y = 0;
+    bool is_touched = false;
+    if (touch_screen.dataAvailable()) {
+      is_touched = true;
+      touch_screen.read();
+      touch_x = (uint16_t)touch_screen.getX();
+      touch_y = (uint16_t)touch_screen.getY();
+    }
+
+    // Process current screen's touch input and hardware button input.
+    t_davega_button_input input = {
+        button_1_pressed,
+        button_2_pressed,
+        button_3_pressed,
+        is_touched,
+        touch_x,
+        touch_y
+      };
+    int navigationCommand = scr->handleTouchInput(&input);
 
     vesc_comm.fetch_packet();
 

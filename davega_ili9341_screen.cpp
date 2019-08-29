@@ -24,18 +24,8 @@
 #define TFT_DC  9
 #define TFT_CS 10
 
-
 ILI9341_t3 tft = ILI9341_t3(TFT_CS, TFT_DC);
 ILI9341_t3* p_tft = nullptr;
-
-#define TCLK 19
-#define TCS 20
-#define TDIN 21
-#define DOUT 22
-#define IRQ 23
-
-URTouch touch(IRQ, DOUT, TDIN, TCS, TCLK);
-URTouch* p_touch = nullptr;
 
 void DavegaILI9341Screen::init(t_davega_screen_config *config) {
     DavegaScreen::init(config);
@@ -45,15 +35,6 @@ void DavegaILI9341Screen::init(t_davega_screen_config *config) {
         p_tft->setRotation(config->orientation);
         p_tft->fillScreen(ILI9341_BLACK);
         Serial.println("initialized screen");
-
     }
-
-    if (!p_touch) {
-      p_touch = &touch;
-      p_touch->InitTouch();
-      p_touch->setPrecision(PREC_MEDIUM);
-    }
-
     _tft = p_tft;
-    _touch = p_touch;    
 }

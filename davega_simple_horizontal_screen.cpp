@@ -61,7 +61,7 @@ void DavegaSimpleHorizontalScreen::reset() {
 
     _tft->fillRect(216, 220, 101, 20, ILI9341_WHITE);
     _tft->setCursor(244, 227);
-    _tft->print("BUTTON 3");
+    _tft->print("Settings");
 
     // FW version
     _tft->setCursor(0, 115);
@@ -152,18 +152,9 @@ void DavegaSimpleHorizontalScreen::heartbeat(uint32_t duration_ms, bool successf
     _tft->fillRect(91, 167, 6, 6, ILI9341_BLACK);
 }
 
-t_davega_touch_input DavegaSimpleHorizontalScreen::handleTouchInput() {
-  if (_touch->dataAvailable()) {
-    _touch->read();
-    int touch_x = _touch->getX();
-    int touch_y = _touch->getY();
+uint8_t DavegaSimpleHorizontalScreen::handleTouchInput(t_davega_button_input* input) {
+  //TODO: process touch input
 
-    boolean button_1_pressed = touch_x < 105 && touch_y >=190;
-    boolean button_2_pressed = touch_x >= 105 && touch_x < 215 && touch_y >=190;
-    boolean button_3_pressed = touch_x >= 215 && touch_y >=190;
-
-    return {button_1_pressed, button_2_pressed, button_3_pressed};
-  }
-
-  return {};
+  return 0;
+  
 }

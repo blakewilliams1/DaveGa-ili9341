@@ -24,8 +24,6 @@
 #include <SD.h>
 #include <SPI.h>
 #include <Time.h>
-#include <URTouch.h>
-#include <URTouchCD.h>
 #include "davega_screen.h"
 
 class DavegaILI9341Screen: public DavegaScreen {
@@ -35,7 +33,6 @@ public:
 protected:
 
     ILI9341_t3* _tft;
-    URTouch* _touch;
 };
 
 #endif //DAVEGA_ILI9341_H
