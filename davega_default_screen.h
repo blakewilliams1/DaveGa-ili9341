@@ -26,6 +26,11 @@
 
 class DavegaDefaultScreen: public DavegaILI9341Screen {
 public:
+	DavegaDefaultScreen() {
+	  #ifdef DEFAULT_SCREEN_ENABLED
+	  id = DEFAULT_SCREEN_ENABLED;
+	  #endif
+	}
     void reset();
     void update(t_davega_data* data);
     void heartbeat(uint32_t duration_ms, bool successful_vesc_read);

@@ -125,6 +125,7 @@
 #define COUNTER_RESET_TIME 3000  // ms
 
 // This corresponds (more or less) to how often data is read from VESC.
+#define UPDATE_DELAY 120  // ms
 
 // 0=portrait, 1=right rotated landscape, 2=reverse portrait, 3=left rotated landscape
 #define SCREEN_ORIENTATION 1

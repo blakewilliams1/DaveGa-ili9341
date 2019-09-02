@@ -23,25 +23,14 @@
 #include <ILI9341_t3.h> // Hardware-specific library
 #include "davega_ili9341_screen.h"
 #include "davega_simple_screen.h"
+#include "davega_config.h"
 
 class DavegaRealtimeStatScreen: public DavegaILI9341Screen {
 public:
-    DavegaRealtimeStatScreen(t_screen_item initial_item) {
-        switch(initial_item) {
-          case SCR_SPEED:
-            use_speed = true;
-            break;
-          case SCR_MOTOR_CURRENT:
-            use_motor_current = true;
-            break;
-          case SCR_DUTY_CYCLE:
-            use_duty_cycle = true;
-            break;
-        }
-
-        for (short i = 0; i < 305; i++) {
-          graph_lines[i][0] = 0;
-        }
+    DavegaRealtimeStatScreen() {
+      #ifdef REALTIME_STATS_SCREEN_ENABLED
+      id = REALTIME_STATS_SCREEN_ENABLED;
+      #endif
     }
 
     void reset();
@@ -62,7 +51,7 @@ protected:
     float _min_y_value = -15.0f;
     uint16_t _x_position = 0;
     unsigned int _graph_colors[5] = {ILI9341_RED, ILI9341_GREEN, ILI9341_BLUE, ILI9341_YELLOW, ILI9341_ORANGE};
-    short graph_lines[305][1] = {{0}};
+    short graph_lines[305][5] = {{0}};
     bool _selecting_graphs = true;
 
     float _get_item_value(t_davega_data* data, t_screen_item item);

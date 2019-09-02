@@ -26,7 +26,15 @@
 
 class DavegaSimpleHorizontalScreen: public DavegaILI9341Screen {
 public:
-    DavegaSimpleHorizontalScreen(t_screen_item primary_item) { _primary_item = primary_item; }
+    DavegaSimpleHorizontalScreen(t_screen_item primary_item) {
+      _primary_item = primary_item;
+      #ifdef SIMPLE_HORIZONTAL_SCREEN_ENABLED
+      id = SIMPLE_HORIZONTAL_SCREEN_ENABLED
+      #endif
+    }
+    DavegaSimpleHorizontalScreen() {
+      DavegaSimpleHorizontalScreen(SCR_SPEED);
+    }
     void reset();
     void update(t_davega_data* data);
     void heartbeat(uint32_t duration_ms, bool successful_vesc_read);

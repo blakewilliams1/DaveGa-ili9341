@@ -23,10 +23,19 @@
 #include <ILI9341_t3.h> // Hardware-specific library
 #include "davega_ili9341_screen.h"
 #include "davega_simple_screen.h"
+#include "davega_config.h"
 
 class DavegaSimpleVerticalScreen: public DavegaILI9341Screen {
 public:
-    DavegaSimpleVerticalScreen(t_screen_item primary_item) { _primary_item = primary_item; }
+    DavegaSimpleVerticalScreen(t_screen_item primary_item) {
+      _primary_item = primary_item;
+      #ifdef SIMPLE_VERTICAL_SCREEN_ENABLED
+      id = SIMPLE_VERTICAL_SCREEN_ENABLED;
+      #endif
+    }
+    DavegaSimpleVerticalScreen() {
+      DavegaSimpleVerticalScreen(SCR_SPEED);
+    }
     void reset();
     void update(t_davega_data* data);
     void heartbeat(uint32_t duration_ms, bool successful_vesc_read);

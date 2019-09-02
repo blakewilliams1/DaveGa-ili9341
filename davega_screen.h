@@ -72,6 +72,7 @@ public:
     virtual void update(t_davega_data* data) = 0;
     virtual void heartbeat(uint32_t duration_ms, bool successful_vesc_read) = 0;
     virtual uint8_t handleTouchInput(t_davega_button_input* input) = 0;
+    int id;
 
 protected:
     t_davega_screen_config* _config;

@@ -74,16 +74,6 @@ void DavegaRealtimeStatScreen::update(t_davega_data *data) {
     int curr_y_coord = ((item_value - _min_y_value) * -220) / (_max_y_value - _min_y_value) + 220;
     int prev_y_coord = ((prev_value - _min_y_value) * -220) / (_max_y_value - _min_y_value) + 220;
     _tft->drawLine(_x_position + 15, curr_y_coord, _x_position + 14, prev_y_coord, ILI9341_RED);
-
-   // DEBUG
-    if (_x_position > 0) {
-      _tft->fillRect(90, 110, 50, 55, ILI9341_BLUE);
-      _tft->setTextColor(ILI9341_WHITE);
-      _tft->setCursor(95, 115);
-      _tft->print(item_value);
-      _tft->setCursor(95, 130);
-      _tft->print(graph_lines[_x_position - 1][0]);
-    }
   }
   /*if (use_motor_current) {
     item_value = data->motor_amps;
@@ -104,8 +94,13 @@ void DavegaRealtimeStatScreen::update(t_davega_data *data) {
 
 
   // Clean upcoming graph space and remove past wipe's graph lines
-  _tft->drawLine(_x_position + 1, 0, _x_position + 1, y_axis - 1, ILI9341_BLACK);
-  _tft->drawLine(_x_position + 1, y_axis + 1, _x_position + 1, 220, ILI9341_BLACK);
+  int y_top = 0;
+  // Prevents smearing of the Y axis info.
+  if (_x_position >= 245) {
+    y_top += 35;
+  }
+  _tft->drawLine(_x_position + 16, y_top, _x_position + 16, y_axis - 1, ILI9341_BLACK);
+  _tft->drawLine(_x_position + 16, y_axis + 1, _x_position + 16, 220, ILI9341_BLACK);
 
   _x_position++;
   if (_x_position >= 305) _x_position = 0;

@@ -30,7 +30,11 @@ struct Point {
 
 class DavegaSettingsScreen: public DavegaILI9341Screen {
 public:
-    DavegaSettingsScreen() {    }
+    DavegaSettingsScreen() {
+      #ifdef SETTINGS_SCREEN_ENABLED
+      id = SETTINGS_SCREEN_ENABLED;
+      #endif
+    }
 
     void reset();
     void update(t_davega_data* data);

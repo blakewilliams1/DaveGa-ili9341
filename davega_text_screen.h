@@ -24,9 +24,15 @@
 
 #include <ILI9341_t3.h> // Hardware-specific library
 #include "davega_ili9341_screen.h"
+#include "davega_config.h"
 
 class DavegaTextScreen: public DavegaILI9341Screen {
 public:
+    DavegaTextScreen() {
+      #ifdef TEXT_SCREEN_ENABLED
+      id = TEXT_SCREEN_ENABLED;
+      #endif
+    }
     void reset();
     void update(t_davega_data* data);
     void heartbeat(uint32_t duration_ms, bool successful_vesc_read);

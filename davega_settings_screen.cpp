@@ -53,7 +53,7 @@ void DavegaSettingsScreen::reset() {
   // Primary menu item
   _tft->setTextColor(ILI9341_WHITE);
   _tft->setCursor(185, 20);
-  char* primary_item_label;
+  char const* primary_item_label;
   switch(primary_options[_primary_options_index]) {
     case SCR_MOTOR_CURRENT:
       primary_item_label = "Motor Current";
@@ -64,7 +64,7 @@ void DavegaSettingsScreen::reset() {
     case SCR_SPEED:
       primary_item_label = "Speed";
       break;
-    default: "?";
+    default: primary_item_label = "?";
   }
   _tft->print(primary_item_label);
   _tft->fillRect(185, 35, 60, 40, ILI9341_WHITE); 
@@ -80,6 +80,7 @@ void DavegaSettingsScreen::reset() {
   _tft->print("Navigation");
 
   // Simple horizontal screen navigation
+  #ifdef SIMPLE_HORIZONTAL_SCREEN_ENABLED
   _tft->fillRect(
     simple_horizontal_coords.x,
     simple_horizontal_coords.y,
@@ -90,8 +91,10 @@ void DavegaSettingsScreen::reset() {
   _tft->print("Simple");
   _tft->setCursor(simple_horizontal_coords.x + 5, simple_horizontal_coords.y + 20);
   _tft->print("Horizontal");
+  #endif
 
   // Simple vertical screen navigation
+  #ifdef SIMPLE_VERTICAL_SCREEN_ENABLED
   _tft->fillRect(
     simple_vertical_coords.x,
     simple_vertical_coords.y,
@@ -102,8 +105,10 @@ void DavegaSettingsScreen::reset() {
   _tft->print("Simple");
   _tft->setCursor(simple_vertical_coords.x + 5, simple_vertical_coords.y + 20);
   _tft->print("Vertical");
+  #endif
 
   // Text screen navigation
+  #ifdef TEXT_SCREEN_ENABLED
   _tft->fillRect(
     text_screen_coords.x,
     text_screen_coords.y,
@@ -114,8 +119,10 @@ void DavegaSettingsScreen::reset() {
   _tft->print("Text");
   _tft->setCursor(text_screen_coords.x + 5, text_screen_coords.y + 20);
   _tft->print("Screen");
+  #endif
 
   // Realtime graph screen navigation
+  #ifdef REALTIME_STATS_SCREEN_ENABLED
   _tft->fillRect(
     realtime_graph_coords.x,
     realtime_graph_coords.y,
@@ -126,8 +133,10 @@ void DavegaSettingsScreen::reset() {
   _tft->print("Realtime");
   _tft->setCursor(realtime_graph_coords.x + 5, realtime_graph_coords.y + 20);
   _tft->print("Graph");
+  #endif
 
   // Default screen navigation
+  #ifdef DEFAULT_SCREEN_ENABLED
   _tft->fillRect(
     default_screen_coords.x,
     default_screen_coords.y,
@@ -138,6 +147,7 @@ void DavegaSettingsScreen::reset() {
   _tft->print("Default");
   _tft->setCursor(default_screen_coords.x + 5, default_screen_coords.y + 20);
   _tft->print("Screen");
+  #endif
 
   // FW version
   _tft->setCursor(5, 230);
@@ -219,13 +229,23 @@ uint8_t DavegaSettingsScreen::handleTouchInput(t_davega_button_input* input) {
     #endif
   }
 
+  // Location of text info button with 5px margin.
+  if (input->touch_x > text_screen_coords.x - 5 &&
+      input->touch_x < text_screen_coords.x + 85 &&
+      input->touch_y < text_screen_coords.y - 5 &&
+      input->touch_y < text_screen_coords.y + 45) {
+    #ifdef TEXT_SCREEN_ENABLED
+    return TEXT_SCREEN_ENABLED;
+    #endif
+  }
+
   // Location of realtime graph button with 5px margin.
   if (input->touch_x > realtime_graph_coords.x - 5 &&
       input->touch_x < realtime_graph_coords.x + 85 &&
       input->touch_y < realtime_graph_coords.y - 5 &&
       input->touch_y < realtime_graph_coords.y + 45) {
-    #ifdef REALTIME_STATS_SCREEN_ENABLED_WITH_SPEED
-    return REALTIME_STATS_SCREEN_ENABLED_WITH_SPEED;
+    #ifdef REALTIME_STATS_SCREEN_ENABLED
+    return REALTIME_STATS_SCREEN_ENABLED;
     #endif
   }
 
