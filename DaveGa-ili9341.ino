@@ -290,6 +290,7 @@ void set_screen(int screen_id, int primary_item) {
   for (unsigned int i = 0; i < LEN(davega_screens); i++) {
     if (screen_id == davega_screens[i]->id) {
       scr = davega_screens[i];
+      scr->reset();
     }
   }
 }
@@ -316,14 +317,22 @@ void loop() {
     button_2_last_up_time = millis();
   }
 
+  // Process touch input and send to the screen for interpretting.
   int touch_x = 0;
   int touch_y = 0;
   bool is_touched = false;
   if (touch_screen.dataAvailable()) {
     is_touched = true;
     touch_screen.read();
-    touch_x = (uint16_t)touch_screen.getX();
-    touch_y = (uint16_t)touch_screen.getY();
+    // Touch screen library gives coordinates from lower right corner
+    // of screen, so fix it depending on orientation.
+    if (SCREEN_ORIENTATION == 1 || SCREEN_ORIENTATION == 3) {
+      touch_x = 320 - (int16_t)touch_screen.getX();
+      touch_y = 240 - (int16_t)touch_screen.getY();
+    } else {
+      touch_x = 240 - (int16_t)touch_screen.getY();
+      touch_y = 320 - (int16_t)touch_screen.getX();
+    }
   }
 
   // Process current screen's touch input and hardware button input.
@@ -360,6 +369,11 @@ void loop() {
     #ifdef DEFAULT_SCREEN_ENABLED
     case DEFAULT_SCREEN_ENABLED:
     set_screen(DEFAULT_SCREEN_ENABLED, 0);
+    break;
+    #endif
+    #ifdef SETTINGS_SCREEN_ENABLED
+    case SETTINGS_SCREEN_ENABLED:
+    set_screen(SETTINGS_SCREEN_ENABLED, 0);
     break;
     #endif
   }

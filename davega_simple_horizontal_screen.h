@@ -29,7 +29,7 @@ public:
     DavegaSimpleHorizontalScreen(t_screen_item primary_item) {
       _primary_item = primary_item;
       #ifdef SIMPLE_HORIZONTAL_SCREEN_ENABLED
-      id = SIMPLE_HORIZONTAL_SCREEN_ENABLED
+      id = SIMPLE_HORIZONTAL_SCREEN_ENABLED;
       #endif
     }
     DavegaSimpleHorizontalScreen() {

@@ -53,6 +53,10 @@ void DavegaRealtimeStatScreen::reset() {
     _tft->setTextColor(ILI9341_BLACK);
     _tft->setCursor(210, 223);
     _tft->print("Change graph");*/
+    _tft->fillRect(216, 220, 101, 20, ILI9341_WHITE);
+    _tft->setCursor(244, 227);
+    _tft->setTextColor(ILI9341_BLACK);
+    _tft->print("Settings");
 
   _just_reset = true;
 }
@@ -152,5 +156,12 @@ void DavegaRealtimeStatScreen::heartbeat(uint32_t duration_ms, bool successful_v
 }
 
 uint8_t DavegaRealtimeStatScreen::handleTouchInput(t_davega_button_input* input) {
+  // Navigate to settings menu
+  if (input->touch_x > 215 && input->touch_y > 220) {
+    #ifdef SETTINGS_SCREEN_ENABLED
+    return SETTINGS_SCREEN_ENABLED;
+    #endif
+  }
+
   return 0;
 }
