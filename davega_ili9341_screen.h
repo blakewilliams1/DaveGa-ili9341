@@ -26,6 +26,13 @@
 #include <Time.h>
 #include "davega_screen.h"
 
+typedef struct {
+    uint16_t x;
+    uint16_t y;
+    uint16_t width;
+    uint16_t height;
+} Point;
+
 class DavegaILI9341Screen: public DavegaScreen {
 public:
     void init(t_davega_screen_config* config) override;

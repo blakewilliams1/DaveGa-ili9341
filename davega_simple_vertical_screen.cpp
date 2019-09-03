@@ -145,5 +145,11 @@ void DavegaSimpleVerticalScreen::heartbeat(uint32_t duration_ms, bool successful
 }
 
 uint8_t DavegaSimpleVerticalScreen::handleTouchInput(t_davega_button_input* input) {
+  // DEBUG, remove when finished:
+  _tft->fillRect(100, 100, 100, 40, ILI9341_BLUE);
+  _tft->setCursor(105, 105);
+  _tft->print(input->touch_x);
+  _tft->setCursor(105, 115);
+  _tft->print(input->touch_y);
   return 0;
 }

@@ -212,7 +212,7 @@ uint8_t DavegaSettingsScreen::handleTouchInput(t_davega_button_input* input) {
   // Location of simple horizontal button with 5px margin.
   if (input->touch_x > simple_horizontal_coords.x - 5 &&
       input->touch_x < simple_horizontal_coords.x + 85 &&
-      input->touch_y < simple_horizontal_coords.y - 5 &&
+      input->touch_y > simple_horizontal_coords.y - 5 &&
       input->touch_y < simple_horizontal_coords.y + 45) {
     #ifdef SIMPLE_HORIZONTAL_SCREEN_ENABLED
     return SIMPLE_HORIZONTAL_SCREEN_ENABLED;
@@ -222,7 +222,7 @@ uint8_t DavegaSettingsScreen::handleTouchInput(t_davega_button_input* input) {
   // Location of simple vertical button with 5px margin.
   if (input->touch_x > simple_vertical_coords.x - 5 &&
       input->touch_x < simple_vertical_coords.x + 85 &&
-      input->touch_y < simple_vertical_coords.y - 5 &&
+      input->touch_y > simple_vertical_coords.y - 5 &&
       input->touch_y < simple_vertical_coords.y + 45) {
     #ifdef SIMPLE_VERTICAL_SCREEN_ENABLED
     return SIMPLE_VERTICAL_SCREEN_ENABLED;
@@ -232,7 +232,7 @@ uint8_t DavegaSettingsScreen::handleTouchInput(t_davega_button_input* input) {
   // Location of text info button with 5px margin.
   if (input->touch_x > text_screen_coords.x - 5 &&
       input->touch_x < text_screen_coords.x + 85 &&
-      input->touch_y < text_screen_coords.y - 5 &&
+      input->touch_y > text_screen_coords.y - 5 &&
       input->touch_y < text_screen_coords.y + 45) {
     #ifdef TEXT_SCREEN_ENABLED
     return TEXT_SCREEN_ENABLED;
@@ -242,7 +242,7 @@ uint8_t DavegaSettingsScreen::handleTouchInput(t_davega_button_input* input) {
   // Location of realtime graph button with 5px margin.
   if (input->touch_x > realtime_graph_coords.x - 5 &&
       input->touch_x < realtime_graph_coords.x + 85 &&
-      input->touch_y < realtime_graph_coords.y - 5 &&
+      input->touch_y > realtime_graph_coords.y - 5 &&
       input->touch_y < realtime_graph_coords.y + 45) {
     #ifdef REALTIME_STATS_SCREEN_ENABLED
     return REALTIME_STATS_SCREEN_ENABLED;
@@ -252,7 +252,7 @@ uint8_t DavegaSettingsScreen::handleTouchInput(t_davega_button_input* input) {
   // Location of default screen button with 5px margin.
   if (input->touch_x > default_screen_coords.x - 5 &&
       input->touch_x < default_screen_coords.x + 85 &&
-      input->touch_y < default_screen_coords.y - 5 &&
+      input->touch_y > default_screen_coords.y - 5 &&
       input->touch_y < default_screen_coords.y + 45) {
     #ifdef DEFAULT_SCREEN_ENABLED
     return DEFAULT_SCREEN_ENABLED;

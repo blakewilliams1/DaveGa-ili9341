@@ -109,7 +109,6 @@ void DavegaSimpleHorizontalScreen::update(t_davega_data *data) {
       _update_battery_indicator(data->battery_percent, _just_reset);
     }
 
-
     _last_fault_code = data->vesc_fault_code;
     _just_reset = false;
 }
@@ -154,7 +153,11 @@ void DavegaSimpleHorizontalScreen::heartbeat(uint32_t duration_ms, bool successf
 
 uint8_t DavegaSimpleHorizontalScreen::handleTouchInput(t_davega_button_input* input) {
   //TODO: process touch input
-
+  if (input->touch_x > 215 && input->touch_y > 219) {
+    #ifdef SETTINGS_SCREEN_ENABLED
+    return SETTINGS_SCREEN_ENABLED;
+    #endif
+  }
   return 0;
   
 }

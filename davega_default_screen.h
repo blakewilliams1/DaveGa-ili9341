@@ -34,6 +34,7 @@ public:
     void reset();
     void update(t_davega_data* data);
     void heartbeat(uint32_t duration_ms, bool successful_vesc_read);
+    uint8_t handleTouchInput(t_davega_button_input* input);
 
 protected:
     // Have we just reset the screen? Unset by the first update() call.

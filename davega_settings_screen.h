@@ -24,10 +24,6 @@
 #include "davega_ili9341_screen.h"
 #include "davega_simple_screen.h"
 
-struct Point {
-  short x, y, width, height;
-};
-
 class DavegaSettingsScreen: public DavegaILI9341Screen {
 public:
     DavegaSettingsScreen() {
