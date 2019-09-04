@@ -27,11 +27,16 @@
 #include "davega_screen.h"
 
 typedef struct {
+    uint8_t x;
+    uint8_t y;
+} Point;
+
+typedef struct {
     uint16_t x;
     uint16_t y;
     uint16_t width;
     uint16_t height;
-} Point;
+} Button;
 
 class DavegaILI9341Screen: public DavegaScreen {
 public:

@@ -42,11 +42,11 @@ protected:
     uint8_t _primary_options_index = 0;
     // Have we just reset the screen? Unset by the first update() call.
     bool _just_reset = false;
-    Point simple_horizontal_coords = {20, 115, 70, 40};
-    Point simple_vertical_coords = {120, 115, 70, 40};
-    Point text_screen_coords = {220, 115, 70, 40};
-    Point realtime_graph_coords = {20, 175, 70, 40};
-    Point default_screen_coords = {120, 175, 70, 40};
+    Button simple_horizontal_coords = {20, 115, 70, 40};
+    Button simple_vertical_coords = {120, 115, 70, 40};
+    Button text_screen_coords = {220, 115, 70, 40};
+    Button realtime_graph_coords = {20, 175, 70, 40};
+    Button default_screen_coords = {120, 175, 70, 40};
 
     vesc_comm_fault_code _last_fault_code = FAULT_CODE_NONE;
 

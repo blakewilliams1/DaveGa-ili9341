@@ -24,41 +24,41 @@
 #include "tft_util.h"
 #include <ILI9341_t3.h> // Hardware-specific library
 
-#define BATTERY_INDICATOR_CELL_WIDTH 14
-#define BATTERY_INDICATOR_CELL_HEIGHT 15
+#define BATTERY_INDICATOR_CELL_WIDTH 19
+#define BATTERY_INDICATOR_CELL_HEIGHT 20
 
-#define SPEED_INDICATOR_CELL_WIDTH 10
-#define SPEED_INDICATOR_CELL_HEIGHT 11
+#define SPEED_INDICATOR_CELL_WIDTH 16
+#define SPEED_INDICATOR_CELL_HEIGHT 17
 
 #define LEN(X) (sizeof(X) / sizeof(X[0]))
 
 const Point PROGMEM BATTERY_INDICATOR_CELLS[] = {
     // left column
-    {0, 204},  {0, 187},  {0, 170},  {0, 153},  {0, 136},
-    {0, 119},  {0, 102},  {0, 85},  {0, 68},  {0, 51},
-    {0, 34},  {0, 17},
+    {0, 278},  {0, 255},  {0, 232},  {0, 209},  {0, 185},
+    {0, 162},  {0, 139},  {0, 116},  {0, 93},  {0, 70},
+    {0, 46},  {0, 23},
     // top row
-    {0, 0},  {16, 0},  {32, 0},  {48, 0},  {64, 0},
-    {80, 0},  {96, 0},  {112, 0},  {128, 0},  {144, 0},
-    {160, 0},
+    {0, 0},  {22, 0},  {44, 0},  {65, 0},  {87, 0},
+    {109, 0},  {131, 0},  {153, 0},  {175, 0},  {196, 0},
+    {218, 0},
     // right column
-    {160, 17},  {160, 34},  {160, 51},  {160, 68},  {160, 85},
-    {160, 102},  {160, 119},  {160, 136},  {160, 153},  {160, 170},
-    {160, 187},  {160, 204},
+    {218, 23},  {218, 46},  {218, 70},  {218, 93},  {218, 116},
+    {218, 139},  {218, 162},  {218, 185},  {218, 209},  {218, 232},
+    {218, 255},  {218, 278},
 };
 
 const Point PROGMEM SPEED_INDICATOR_CELLS[] = {
     // bottom-left row
-    {57, 151},  {41, 151}, {25, 151},
+    {77, 205},  {55, 205}, {33, 205},
     // left column
-    {25, 134}, {25, 117}, {25, 100}, {25, 84},
+    {33, 182}, {33, 159}, {33, 135}, {33, 114},
     // top row
-    {25, 66}, {41, 66}, {57, 66}, {73, 66}, {90, 66},
-    {106, 66}, {122, 66}, {138, 66},
+    {33, 89}, {55, 89}, {77, 89}, {99, 89}, {122, 89},
+    {144, 89}, {165, 89}, {187, 89},
     // right column
-    {138, 83}, {138, 100}, {138, 117}, {138, 134},
+    {187, 112}, {187, 135}, {187, 159}, {187, 182},
     // bottom-right row
-    {138, 151}, {122, 151}, {106, 151},
+    {187, 205}, {165, 205}, {144, 205},
 };
 
 void DavegaDefaultScreen::reset() {
@@ -67,7 +67,7 @@ void DavegaDefaultScreen::reset() {
 
     // draw FW version
     _tft->setTextColor(ILI9341_WHITE);
-    _tft->setCursor(40, 140);
+    _tft->setCursor(55, 191);
     _tft->print(_config->fw_version);
 
     _just_reset = true;
@@ -84,34 +84,34 @@ void DavegaDefaultScreen::update(t_davega_data* data) {
         dtostrf(data->voltage / _config->battery_cells, 4, 2, fmt);
     else
         dtostrf(data->voltage, 4, 1, fmt);
-    tft_util_draw_number(_tft, fmt, 24, 25,  ILI9341_WHITE,  ILI9341_BLACK, 2, 4);
+    tft_util_draw_number(_tft, fmt, 33, 34,  ILI9341_WHITE,  ILI9341_BLACK, 2, 5);
 
     // draw mah
     dtostrf(data->mah, 5, 0, fmt);
-    tft_util_draw_number(_tft, fmt, 84, 25, progress_to_color(data->mah_reset_progress, _tft),  ILI9341_BLACK, 2, 4);
+    tft_util_draw_number(_tft, fmt, 115, 34, progress_to_color(data->mah_reset_progress, _tft),  ILI9341_BLACK, 2, 5);
 
     // draw trip distance
     dtostrf(convert_distance(data->trip_km, _config->imperial_units), 5, 2, fmt);
-    tft_util_draw_number(_tft, fmt, 24, 185, progress_to_color(data->session_reset_progress, _tft),  ILI9341_BLACK, 2, 4);
+    tft_util_draw_number(_tft, fmt, 33, 252, progress_to_color(data->session_reset_progress, _tft),  ILI9341_BLACK, 2, 5);
 
     // draw total distance
     dtostrf(convert_distance(data->total_km, _config->imperial_units), 4, 0, fmt);
-    tft_util_draw_number(_tft, fmt, 98, 185,  ILI9341_WHITE,  ILI9341_BLACK, 2, 4);
+    tft_util_draw_number(_tft, fmt, 134, 252,  ILI9341_WHITE,  ILI9341_BLACK, 2, 5);
 
     // draw speed
     uint8_t speed = round(convert_speed(data->speed_kph, _config->imperial_units));
     if (speed >= 10)
-        tft_util_draw_digit(_tft, speed / 10, 60, 91,  ILI9341_WHITE,  ILI9341_BLACK, 7);
+        tft_util_draw_digit(_tft, speed / 10, 82, 124,  ILI9341_WHITE,  ILI9341_BLACK, 10);
     else
-        _tft->fillRect(60, 91, 22, 36,  ILI9341_BLACK);
-        tft_util_draw_digit(_tft, speed % 10, 89, 91,  ILI9341_WHITE,  ILI9341_BLACK, 7);
+        _tft->fillRect(82, 124, 30, 49,  ILI9341_BLACK);
+        tft_util_draw_digit(_tft, speed % 10, 121, 124,  ILI9341_WHITE,  ILI9341_BLACK, 10);
 
     // draw warning
     if (data->vesc_fault_code != FAULT_CODE_NONE) {
         uint16_t bg_color = ILI9341_RED;
         _tft->fillScreen(bg_color);
         _tft->setTextColor(ILI9341_BLACK);
-        _tft->setCursor(5, 65);
+        _tft->setCursor(7, 89);
         _tft->print(vesc_fault_code_to_string(data->vesc_fault_code));
     }
 
@@ -124,9 +124,9 @@ void DavegaDefaultScreen::update(t_davega_data* data) {
 
 void DavegaDefaultScreen::heartbeat(uint32_t duration_ms, bool successful_vesc_read) {
     uint16_t color = successful_vesc_read ? ILI9341_GREEN : ILI9341_RED;
-    _tft->fillRect(85, 155, 6, 6, color);
+    _tft->fillRect(116, 211, 6, 6, color);
     delay(duration_ms);
-    _tft->fillRect(85, 155, 6, 6,  ILI9341_BLACK);
+    _tft->fillRect(116, 211, 6, 6,  ILI9341_BLACK);
 }
 
 void DavegaDefaultScreen::_draw_labels() {
@@ -145,6 +145,12 @@ void DavegaDefaultScreen::_draw_labels() {
     _tft->setCursor(132, 239);
     _tft->print("TOTAL");
 
+    _tft->fillRect(112, 295, 123, 20, ILI9341_WHITE);
+    _tft->setTextColor(ILI9341_BLACK);
+    _tft->setCursor(150, 300);
+    _tft->print("Settings");
+
+    _tft->setTextColor(ILI9341_WHITE);
     if (_config->imperial_units) {
         _tft->setCursor(68, 284);
         _tft->print("MILES");
@@ -240,5 +246,10 @@ void DavegaDefaultScreen::_update_speed_indicator(float speed_percent, bool redr
 }
 
 uint8_t DavegaDefaultScreen::handleTouchInput(t_davega_button_input* input) {
+  if (input->touch_x > 112 && input->touch_y > 295) {
+    #ifdef SETTINGS_SCREEN_ENABLED
+    return SETTINGS_SCREEN_ENABLED;
+    #endif
+  }
   return 0;
 }
