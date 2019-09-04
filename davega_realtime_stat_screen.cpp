@@ -49,53 +49,37 @@ void DavegaRealtimeStatScreen::reset() {
   _tft->print(_config->fw_version);
 
   // Draw buttons
-  /*_tft->fillRect(200, 220, 100, 15, ILI9341_WHITE);
-    _tft->setTextColor(ILI9341_BLACK);
-    _tft->setCursor(210, 223);
-    _tft->print("Change graph");*/
-    _tft->fillRect(216, 220, 101, 20, ILI9341_WHITE);
-    _tft->setCursor(244, 227);
-    _tft->setTextColor(ILI9341_BLACK);
-    _tft->print("Settings");
+  _tft->fillRect(200, 220, 100, 15, ILI9341_WHITE);
+  _tft->setTextColor(ILI9341_BLACK);
+  _tft->setCursor(210, 223);
+  _tft->print("Change graph");
+  _tft->fillRect(216, 220, 101, 20, ILI9341_WHITE);
+  _tft->setCursor(244, 227);
+  _tft->setTextColor(ILI9341_BLACK);
+  _tft->print("Settings");
 
   _just_reset = true;
 }
 
 void DavegaRealtimeStatScreen::update(t_davega_data *data) {
-  char fmt[10];
-
   if (data->vesc_fault_code != _last_fault_code)
     reset();
 
   int y_axis = (_max_y_value * 220) / (_max_y_value - _min_y_value);
   float item_value = 0;
   short prev_value = 0;
+  // Iterate over graphs and draw the selected ones.
+  for (int i = 0; i < 5; i++) {
+    if (!selected_graphs[i]) continue;
+
+    item_value = _get_item_value(data, graph_value_types[i]);
+    prev_value = _x_position > 0 ? graph_lines[_x_position - 1][i] / 100 : 0;
+    graph_lines[_x_position][i] = (short)item_value * 100;
     // Y coords derived from affine transformations.
-  if (use_speed) {
-    item_value = convert_speed(data->speed_kph, _config->imperial_units);
-    prev_value = _x_position > 0 ? graph_lines[_x_position - 1][0] / 100 : 0;
-    graph_lines[_x_position][0] =  (short)item_value * 100;
     int curr_y_coord = ((item_value - _min_y_value) * -220) / (_max_y_value - _min_y_value) + 220;
     int prev_y_coord = ((prev_value - _min_y_value) * -220) / (_max_y_value - _min_y_value) + 220;
-    _tft->drawLine(_x_position + 15, curr_y_coord, _x_position + 14, prev_y_coord, ILI9341_RED);
+    _tft->drawLine(_x_position + 15, curr_y_coord, _x_position + 14, prev_y_coord, _graph_colors[i]);
   }
-  /*if (use_motor_current) {
-    item_value = data->motor_amps;
-    prev_value = graph_lines[_x_position - 1][1] / 100;
-    graph_lines[_x_position][1] = (int16_t)(item_value * 100);
-    int curr_y_coord = ((item_value - _min_y_value) * -200) / (_max_y_value - _min_y_value) + 200;
-    int prev_y_coord = ((prev_value - _min_y_value) * -200) / (_max_y_value - _min_y_value) + 200;
-    _tft->drawLine(_x_position + 15, curr_y_coord, _x_position + 14, prev_y_coord, ILI9341_GREEN);
-  }
-  if (use_duty_cycle) {
-    item_value = data->duty_cycle * 100.0f;
-    prev_value = graph_lines[_x_position - 1][2] / 100;
-    graph_lines[_x_position][2] = (int16_t)(item_value * 100);
-    int curr_y_coord = ((item_value - _min_y_value) * -200) / (_max_y_value - _min_y_value) + 200;
-    int prev_y_coord = ((prev_value - _min_y_value) * -200) / (_max_y_value - _min_y_value) + 200;
-    _tft->drawLine(_x_position + 15, curr_y_coord, _x_position + 14, prev_y_coord, ILI9341_BLUE);
-  }*/
-
 
   // Clean upcoming graph space and remove past wipe's graph lines
   int y_top = 0;
@@ -125,12 +109,16 @@ void DavegaRealtimeStatScreen::update(t_davega_data *data) {
 
 float DavegaRealtimeStatScreen::_get_item_value(t_davega_data* data, t_screen_item item) {
   switch (item) {
+    case SCR_SPEED:
+      return convert_speed(data->speed_kph, _config->imperial_units);
     case SCR_MOSFET_TEMPERATURE:
       return convert_temperature(data->mosfet_celsius, _config->use_fahrenheit);
     case SCR_MOTOR_TEMPERATURE:
       return convert_temperature(data->motor_celsius, _config->use_fahrenheit);
     case SCR_BATTERY_CURRENT:
       return data->battery_amps;
+    case SCR_MOTOR_CURRENT:
+      return data->motor_amps;
     case SCR_TOTAL_VOLTAGE:
       return data->voltage;
     case SCR_BATTERY_CAPACITY_PERCENT:

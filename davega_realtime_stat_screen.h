@@ -25,6 +25,13 @@
 #include "davega_simple_screen.h"
 #include "davega_config.h"
 
+typedef struct {
+  bool visible;
+  t_screen_item item_type;
+  const char* label;
+  uint16_t color;
+} GraphElement;
+
 class DavegaRealtimeStatScreen: public DavegaILI9341Screen {
 public:
     DavegaRealtimeStatScreen() {
@@ -50,12 +57,19 @@ protected:
     float _max_y_value = 50.0f;
     float _min_y_value = -15.0f;
     uint16_t _x_position = 0;
-    unsigned int _graph_colors[5] = {ILI9341_RED, ILI9341_GREEN, ILI9341_BLUE, ILI9341_YELLOW, ILI9341_ORANGE};
+    uint16_t _graph_colors[5] = {ILI9341_RED, ILI9341_GREEN, ILI9341_BLUE, ILI9341_YELLOW, ILI9341_ORANGE};
+    // speed, batt current, motor current, motor temp, FET temp 
+    t_screen_item graph_value_types[5] =
+        {SCR_SPEED, SCR_BATTERY_CURRENT, SCR_MOTOR_CURRENT, SCR_MOTOR_TEMPERATURE, SCR_MOSFET_TEMPERATURE};
+    bool selected_graphs[5] = {true, true, false, false, false};
     short graph_lines[305][5] = {{0}};
     bool _selecting_graphs = true;
 
     float _get_item_value(t_davega_data* data, t_screen_item item);
     void _update_battery_indicator(float battery_percent, bool redraw = false);
+
+private:
+    void draw_checkmark(uint16_t x, uint16_t y, bool checked);
 };
 
 #endif //DAVEGA_REALTIME_STATS_SCREEN_H
