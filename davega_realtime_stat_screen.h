@@ -51,17 +51,19 @@ protected:
 
     vesc_comm_fault_code _last_fault_code = FAULT_CODE_NONE;
 
-    bool use_speed = true;
-    bool use_motor_current = false;
-    bool use_duty_cycle = false;
+    long _last_screen_switch = 0;
+    long _last_press = 0;
     float _max_y_value = 50.0f;
     float _min_y_value = -15.0f;
     uint16_t _x_position = 0;
-    uint16_t _graph_colors[5] = {ILI9341_RED, ILI9341_GREEN, ILI9341_BLUE, ILI9341_YELLOW, ILI9341_ORANGE};
-    // speed, batt current, motor current, motor temp, FET temp 
-    t_screen_item graph_value_types[5] =
-        {SCR_SPEED, SCR_BATTERY_CURRENT, SCR_MOTOR_CURRENT, SCR_MOTOR_TEMPERATURE, SCR_MOSFET_TEMPERATURE};
-    bool selected_graphs[5] = {true, true, false, false, false};
+    GraphElement graph_elements[6] = {
+      {true, SCR_SPEED, "Speed", ILI9341_RED},
+      {true, SCR_BATTERY_CURRENT, "Bat Current", ILI9341_GREEN},
+      {false, SCR_MOTOR_CURRENT, "Motor Current", ILI9341_BLUE},
+      {false, SCR_MOTOR_TEMPERATURE, "Motor Temp", ILI9341_YELLOW},
+      {false, SCR_DUTY_CYCLE, "Duty Cycle", ILI9341_PURPLE},
+      {false, SCR_MOSFET_TEMPERATURE, "FET Temp", ILI9341_CYAN},
+    };
     short graph_lines[305][5] = {{0}};
     bool _selecting_graphs = true;
 
@@ -69,6 +71,7 @@ protected:
     void _update_battery_indicator(float battery_percent, bool redraw = false);
 
 private:
+    void draw_graph_menu();
     void draw_checkmark(uint16_t x, uint16_t y, bool checked);
 };
 

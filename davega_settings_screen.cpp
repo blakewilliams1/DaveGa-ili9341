@@ -42,7 +42,7 @@ void DavegaSettingsScreen::reset() {
   // Other units
   _tft->setTextColor(ILI9341_WHITE);
   _tft->setCursor(100, 20);
-  _tft->print(_config->use_fahrenheit ? "Imperial" : "Metric");
+  _tft->print(_config->imperial_units ? "Imperial" : "Metric");
   _tft->fillRect(100, 35, 60, 40, ILI9341_WHITE); 
   _tft->setTextColor(ILI9341_BLACK);
   _tft->setCursor(110, 45);
@@ -194,19 +194,27 @@ void DavegaSettingsScreen::heartbeat(uint32_t duration_ms, bool successful_vesc_
 uint8_t DavegaSettingsScreen::handleTouchInput(t_davega_button_input* input) {
   // TODO process more touch input.
   // Toggle temp units.
-  if (input->touch_x < 80 && input->touch_y < 80) {
+  bool trigger_redraw = false;
+  if (input->touch_x > 10 && input->touch_x < 80 && input->touch_y < 80) {
     _config->use_fahrenheit = !_config->use_fahrenheit;
+    trigger_redraw = true;
   }
 
   // Toggle other units.
   if (input->touch_x >= 80 && input->touch_x < 160 && input->touch_y < 80) {
     _config->imperial_units = !_config->imperial_units;
+    trigger_redraw = true;
   }
 
   // Increment primary element choice.
   if (input->touch_x >= 160 && input->touch_x < 240 && input->touch_y < 80) {
+    trigger_redraw = true;
     _primary_options_index++;
     if (_primary_options_index > 2) _primary_options_index = 0;
+  }
+
+  if (trigger_redraw) { 
+    reset();
   }
 
   // Location of simple horizontal button with 5px margin.

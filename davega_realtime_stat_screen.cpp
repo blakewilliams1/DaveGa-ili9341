@@ -25,6 +25,7 @@
 #include <ILI9341_t3.h> // Hardware-specific library
 
 void DavegaRealtimeStatScreen::reset() {
+  _selecting_graphs = false;
   _tft->fillScreen(ILI9341_BLACK);
 
   // X axis location is dynamic based on max and min values to display
@@ -49,11 +50,11 @@ void DavegaRealtimeStatScreen::reset() {
   _tft->print(_config->fw_version);
 
   // Draw buttons
-  _tft->fillRect(200, 220, 100, 15, ILI9341_WHITE);
+  _tft->fillRect(100, 220, 100, 18, ILI9341_WHITE);
   _tft->setTextColor(ILI9341_BLACK);
-  _tft->setCursor(210, 223);
+  _tft->setCursor(110, 227);
   _tft->print("Change graph");
-  _tft->fillRect(216, 220, 101, 20, ILI9341_WHITE);
+  _tft->fillRect(216, 220, 100, 18, ILI9341_WHITE);
   _tft->setCursor(244, 227);
   _tft->setTextColor(ILI9341_BLACK);
   _tft->print("Settings");
@@ -65,33 +66,35 @@ void DavegaRealtimeStatScreen::update(t_davega_data *data) {
   if (data->vesc_fault_code != _last_fault_code)
     reset();
 
-  int y_axis = (_max_y_value * 220) / (_max_y_value - _min_y_value);
-  float item_value = 0;
-  short prev_value = 0;
-  // Iterate over graphs and draw the selected ones.
-  for (int i = 0; i < 5; i++) {
-    if (!selected_graphs[i]) continue;
-
-    item_value = _get_item_value(data, graph_value_types[i]);
-    prev_value = _x_position > 0 ? graph_lines[_x_position - 1][i] / 100 : 0;
-    graph_lines[_x_position][i] = (short)item_value * 100;
-    // Y coords derived from affine transformations.
-    int curr_y_coord = ((item_value - _min_y_value) * -220) / (_max_y_value - _min_y_value) + 220;
-    int prev_y_coord = ((prev_value - _min_y_value) * -220) / (_max_y_value - _min_y_value) + 220;
-    _tft->drawLine(_x_position + 15, curr_y_coord, _x_position + 14, prev_y_coord, _graph_colors[i]);
+  if (!_selecting_graphs) {
+    int y_axis = (_max_y_value * 220) / (_max_y_value - _min_y_value);
+    float item_value = 0;
+    short prev_value = 0;
+    // Iterate over graphs and draw the selected ones.
+    for (int i = 0; i < 6; i++) {
+      if (!graph_elements[i].visible) continue;
+  
+      item_value = _get_item_value(data, graph_elements[i].item_type);
+      prev_value = _x_position > 0 ? graph_lines[_x_position - 1][i] / 100 : 0;
+      graph_lines[_x_position][i] = (short)item_value * 100;
+      // Y coords derived from affine transformations.
+      int curr_y_coord = ((item_value - _min_y_value) * -220) / (_max_y_value - _min_y_value) + 220;
+      int prev_y_coord = ((prev_value - _min_y_value) * -220) / (_max_y_value - _min_y_value) + 220;
+      _tft->drawLine(_x_position + 15, curr_y_coord, _x_position + 14, prev_y_coord, graph_elements[i].color);
+    }
+  
+    // Clean upcoming graph space and remove past wipe's graph lines
+    int y_top = 0;
+    // Prevents smearing of the Y axis info.
+    if (_x_position >= 240) {
+      y_top += 35;
+    }
+    _tft->drawLine(_x_position + 16, y_top, _x_position + 16, y_axis - 1, ILI9341_BLACK);
+    _tft->drawLine(_x_position + 16, y_axis + 1, _x_position + 16, 220, ILI9341_BLACK);
+  
+    _x_position++;
+    if (_x_position >= 305) _x_position = 0;
   }
-
-  // Clean upcoming graph space and remove past wipe's graph lines
-  int y_top = 0;
-  // Prevents smearing of the Y axis info.
-  if (_x_position >= 245) {
-    y_top += 35;
-  }
-  _tft->drawLine(_x_position + 16, y_top, _x_position + 16, y_axis - 1, ILI9341_BLACK);
-  _tft->drawLine(_x_position + 16, y_axis + 1, _x_position + 16, 220, ILI9341_BLACK);
-
-  _x_position++;
-  if (_x_position >= 305) _x_position = 0;
 
   // warning
   if (data->vesc_fault_code != FAULT_CODE_NONE) {
@@ -123,32 +126,99 @@ float DavegaRealtimeStatScreen::_get_item_value(t_davega_data* data, t_screen_it
       return data->voltage;
     case SCR_BATTERY_CAPACITY_PERCENT:
       return data->battery_percent * 100.0f;
+    case SCR_DUTY_CYCLE:
+      return data->duty_cycle * 100.0f;
     default: break;
   }
 
   return 0;
 }
 
+void DavegaRealtimeStatScreen::draw_checkmark(uint16_t x, uint16_t y, bool checked) {
+  _tft->drawRect(x, y, 15, 15, ILI9341_WHITE);
+  if (checked) {
+    _tft->drawLine(x + 4, y + 14, x + 16, y - 2, ILI9341_GREEN);
+    _tft->drawLine(x + 5, y + 15, x + 17, y - 3, ILI9341_GREEN);
+    _tft->drawLine(x + 4, y + 14, x, y + 7, ILI9341_GREEN);
+    _tft->drawLine(x + 5, y + 15, x - 1, y + 8, ILI9341_GREEN);
+  }
+}
+
 void DavegaRealtimeStatScreen::_update_battery_indicator(float battery_percent, bool redraw) {
-  _tft->setTextColor(ILI9341_BLACK);
-  _tft->setCursor(170, 230);
-  _tft->print(String(battery_percent) + "%");
+  _tft->fillRect(50, 220, 45, 30, ILI9341_BLACK);
+  _tft->setTextColor(ILI9341_WHITE);
+  _tft->setCursor(60, 230);
+  _tft->print(String(battery_percent * 100) + "%");
   // TODO make cool battery icon.
 }
 
 void DavegaRealtimeStatScreen::heartbeat(uint32_t duration_ms, bool successful_vesc_read) {
   uint16_t color = successful_vesc_read ? ILI9341_GREEN : ILI9341_RED;
-  _tft->fillRect(50, 230, 6, 6, color);
+  _tft->fillRect(35, 230, 6, 6, color);
   delay(duration_ms);
-  _tft->fillRect(50, 230, 6, 6, ILI9341_BLACK);
+  _tft->fillRect(35, 230, 6, 6, ILI9341_BLACK);
+}
+
+void DavegaRealtimeStatScreen::draw_graph_menu() {
+  _tft->fillScreen(ILI9341_BLACK);
+  // Draw the graph choices
+  for (uint8_t i = 0; i < 6; i++) {
+    uint16_t x = 30 + 160 * (i % 2);
+    uint16_t y = 30 + 60 * (i / 2);
+
+    draw_checkmark(x, y, graph_elements[i].visible);
+    _tft->setTextColor(graph_elements[i].color);
+    _tft->setCursor(x + 25, y + 5);
+    _tft->print(graph_elements[i].label);
+  }
+
+  _tft->fillRect(190, 220, 126, 17, ILI9341_WHITE);
+  _tft->setCursor(210, 225);
+  _tft->setTextColor(ILI9341_BLACK);
+  _tft->print("Back to graph");
 }
 
 uint8_t DavegaRealtimeStatScreen::handleTouchInput(t_davega_button_input* input) {
-  // Navigate to settings menu
-  if (input->touch_x > 215 && input->touch_y > 220) {
-    #ifdef SETTINGS_SCREEN_ENABLED
-    return SETTINGS_SCREEN_ENABLED;
-    #endif
+  if (input->touch_x > 0 && input->touch_y > 0) {
+    _last_press = millis();
+  }
+
+  long since_last_switch = millis() - _last_screen_switch;
+  if (_selecting_graphs) {
+    // Iterate through the locations of all the graph type buttons.
+    for (uint8_t i = 0; i < 6; i++) {
+      uint16_t x = 30 + 160 * (i % 2);
+      uint16_t y = 30 + 60 * (i / 2);
+      if (input->touch_x > x - 20 &&
+          input->touch_x < x + 120 &&
+          input->touch_y > y - 20 &&
+          input->touch_y < y + 35) {
+        graph_elements[i].visible = !graph_elements[i].visible;
+        _last_press = millis();
+        draw_graph_menu();
+      }
+    }
+
+    // Touched the 'back to graph' button.
+    if (input->touch_x > 210 && input->touch_y > 210 && since_last_switch > 1000) {
+      _selecting_graphs = false;
+      _last_screen_switch = millis();
+      reset();
+    }
+  } else {
+    // Navigate to settings menu.
+    if (input->touch_x > 215 && input->touch_y > 220 && since_last_switch > 1000) {
+      #ifdef SETTINGS_SCREEN_ENABLED
+      return SETTINGS_SCREEN_ENABLED;
+      #endif
+    }
+
+    // Opens the graph selection menu from graph view.
+    if (input->touch_x < 215 && input->touch_y > 220) {
+      _selecting_graphs = true;
+      _last_screen_switch = millis();
+      draw_graph_menu();
+    }
   }
 
   return 0;

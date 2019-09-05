@@ -23,6 +23,7 @@
 #include <ILI9341_t3.h> // Hardware-specific library
 #include "davega_ili9341_screen.h"
 #include "vesc_comm.h"
+#include "davega_config.h"
 
 class DavegaDefaultScreen: public DavegaILI9341Screen {
 public:
