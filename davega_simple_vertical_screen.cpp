@@ -30,28 +30,34 @@ void DavegaSimpleVerticalScreen::reset() {
 
     // labels
     _tft->setTextColor(ILI9341_WHITE);
-    _tft->setCursor(0, 189);
+    _tft->setCursor(0, 179);
     _tft->print(_config->imperial_units ? "TRIP MI" : "TRIP KM");
-    _tft->setCursor(0, 252);
+    _tft->setCursor(0, 240);
     _tft->print(_config->imperial_units ? "TOTAL MI" : "TOTAL KM");
-    _tft->setCursor(150, 189);
+    _tft->setCursor(150, 179);
     _tft->print("BATTERY %");
-    _tft->setCursor(150, 252);
+    _tft->setCursor(150, 240);
     _tft->print("BATTERY V");
 
     switch (_primary_item) {
         case SCR_BATTERY_CURRENT:
-            _tft->setCursor(145, 0);
+            _tft->setCursor(135, 0);
             _tft->print("BATTERY A");
             break;
         case SCR_MOTOR_CURRENT:
-            _tft->setCursor(96, 0);
+            _tft->setCursor(86, 0);
             _tft->print("MOTOR A");
             break;
         default:
-            _tft->setCursor(122, 0);
+            _tft->setCursor(112, 2);
             _tft->print(_config->imperial_units ? "MPH" : "KPH");
     }
+
+    // Draw settings button.
+    _tft->fillRect(123, 295, 111, 20, ILI9341_WHITE);
+    _tft->setTextColor(ILI9341_BLACK);
+    _tft->setCursor(160, 300);
+    _tft->print("Settings");
 
     // FW version
     _tft->setCursor(0, 0);
@@ -74,22 +80,22 @@ void DavegaSimpleVerticalScreen::update(t_davega_data *data) {
 
     // trip distance
     dtostrf(convert_distance(data->trip_km, _config->imperial_units), 5, 2, fmt);
-    tft_util_draw_number(_tft, fmt, 0, 204, progress_to_color(data->session_reset_progress, _tft), ILI9341_BLACK, 3, 8);
+    tft_util_draw_number(_tft, fmt, 0, 192, progress_to_color(data->session_reset_progress, _tft), ILI9341_BLACK, 3, 8);
 
     // total distance
     format_total_distance(convert_distance(data->total_km, _config->imperial_units), fmt);
-    tft_util_draw_number(_tft, fmt, 0, 266, ILI9341_WHITE, ILI9341_BLACK, 3, 8);
+    tft_util_draw_number(_tft, fmt, 0, 252, ILI9341_WHITE, ILI9341_BLACK, 3, 8);
 
     // battery %
     dtostrf(min(100 * data->battery_percent, 99.9), 4, 1, fmt);
-    tft_util_draw_number(_tft, fmt, 145, 204, progress_to_color(data->mah_reset_progress, _tft), ILI9341_BLACK,3, 8);
+    tft_util_draw_number(_tft, fmt, 145, 192, progress_to_color(data->mah_reset_progress, _tft), ILI9341_BLACK,3, 8);
 
     // battery voltage
     if (_config->per_cell_voltage)
         dtostrf(data->voltage / _config->battery_cells, 4, 2, fmt);
     else
         dtostrf(data->voltage, 4, 1, fmt);
-    tft_util_draw_number(_tft, fmt, 145, 266, ILI9341_WHITE, ILI9341_BLACK, 3, 8);
+    tft_util_draw_number(_tft, fmt, 145, 252, ILI9341_WHITE, ILI9341_BLACK, 3, 8);
 
     // warning
     if (data->vesc_fault_code != FAULT_CODE_NONE) {
@@ -145,11 +151,11 @@ void DavegaSimpleVerticalScreen::heartbeat(uint32_t duration_ms, bool successful
 }
 
 uint8_t DavegaSimpleVerticalScreen::handleTouchInput(t_davega_button_input* input) {
-  // DEBUG, remove when finished:
-  _tft->fillRect(100, 100, 100, 40, ILI9341_BLUE);
-  _tft->setCursor(105, 105);
-  _tft->print(input->touch_x);
-  _tft->setCursor(105, 115);
-  _tft->print(input->touch_y);
+  if (input->touch_x > 120 && input->touch_y > 280) {
+    #ifdef SETTINGS_SCREEN_ENABLED
+    return SETTINGS_SCREEN_ENABLED;
+    #endif
+  }
+
   return 0;
 }

@@ -25,7 +25,13 @@
 #include <ILI9341_t3.h> // Hardware-specific library
 
 void DavegaTextScreen::reset() {
-    _tft->fillScreen(ILI9341_BLACK);
+  _tft->fillScreen(ILI9341_BLACK);
+
+  // Draw settings button.
+  _tft->fillRect(210, 215, 101, 20, ILI9341_WHITE);
+  _tft->setTextColor(ILI9341_BLACK);
+  _tft->setCursor(240, 223);
+  _tft->print("Settings");
 }
 
 void DavegaTextScreen::update(t_davega_data *data) {
@@ -186,5 +192,10 @@ void DavegaTextScreen::_write_line_buffer(int lineno, uint16_t color) {
 }
 
 uint8_t DavegaTextScreen::handleTouchInput(t_davega_button_input* input) {
+  if (input->touch_x > 205 && input->touch_y > 205) {
+    #ifdef SETTINGS_SCREEN_ENABLED
+    return SETTINGS_SCREEN_ENABLED;
+    #endif
+  }
   return 0;
 }

@@ -152,7 +152,7 @@ void DavegaSimpleHorizontalScreen::heartbeat(uint32_t duration_ms, bool successf
 }
 
 uint8_t DavegaSimpleHorizontalScreen::handleTouchInput(t_davega_button_input* input) {
-  if (input->touch_x > 215 && input->touch_y > 219) {
+  if (input->touch_x > 215 && input->touch_y > 210) {
     #ifdef SETTINGS_SCREEN_ENABLED
     return SETTINGS_SCREEN_ENABLED;
     #endif
