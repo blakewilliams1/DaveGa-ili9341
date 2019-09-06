@@ -51,8 +51,7 @@ typedef struct {
     bool per_cell_voltage;
     uint8_t battery_cells;
     bool big_font;
-    t_screen_item* text_screen_items;
-    uint8_t text_screen_items_count;
+    t_screen_item primary_screen_item;
     uint8_t orientation;
 } t_davega_screen_config;
 

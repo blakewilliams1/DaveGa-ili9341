@@ -24,6 +24,8 @@
 
 #define KM_PER_MILE 0.621371
 
+#define LEN(X) (sizeof(X) / sizeof(X[0]))
+
 char* make_fw_version(const char* fw_version, const char* revision_id);
 float convert_distance(float distance_km, bool imperial_units);
 float convert_speed(float speed_kph, bool imperial_units);

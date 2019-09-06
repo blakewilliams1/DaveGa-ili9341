@@ -40,8 +40,6 @@
 #define BUTTON_2_PIN A2
 #define BUTTON_3_PIN A1
 
-#define LEN(X) (sizeof(X) / sizeof(X[0]))
-
 #ifdef FOCBOX_UNITY
 #include "vesc_comm_unity.h"
 VescCommUnity vesc_comm = VescCommUnity();
@@ -60,27 +58,11 @@ DavegaDefaultScreen davega_default_screen = DavegaDefaultScreen();
 #endif
 #ifdef SIMPLE_HORIZONTAL_SCREEN_ENABLED
 #include "davega_simple_horizontal_screen.h"
-DavegaSimpleHorizontalScreen davega_simple_horizontal_screen = DavegaSimpleHorizontalScreen(SCR_SPEED);
-#endif
-#ifdef SIMPLE_HORIZONTAL_SCREEN_WITH_BATTERY_CURRENT_ENABLED
-#include "davega_simple_horizontal_screen.h"
-DavegaSimpleHorizontalScreen davega_simple_horizontal_screen_with_battery_current = DavegaSimpleHorizontalScreen(SCR_BATTERY_CURRENT);
-#endif
-#ifdef SIMPLE_HORIZONTAL_SCREEN_WITH_MOTOR_CURRENT_ENABLED
-#include "davega_simple_horizontal_screen.h"
-DavegaSimpleHorizontalScreen davega_simple_horizontal_screen_with_motor_current = DavegaSimpleHorizontalScreen(SCR_MOTOR_CURRENT);
+DavegaSimpleHorizontalScreen davega_simple_horizontal_screen = DavegaSimpleHorizontalScreen();
 #endif
 #ifdef SIMPLE_VERTICAL_SCREEN_ENABLED
 #include "davega_simple_vertical_screen.h"
 DavegaSimpleVerticalScreen davega_simple_vertical_screen = DavegaSimpleVerticalScreen(SCR_SPEED);
-#endif
-#ifdef SIMPLE_VERTICAL_SCREEN_WITH_BATTERY_CURRENT_ENABLED
-#include "davega_simple_vertical_screen.h"
-DavegaSimpleVerticalScreen davega_simple_vertical_screen_with_battery_current = DavegaSimpleVerticalScreen(SCR_BATTERY_CURRENT);
-#endif
-#ifdef SIMPLE_VERTICAL_SCREEN_WITH_MOTOR_CURRENT_ENABLED
-#include "davega_simple_vertical_screen.h"
-DavegaSimpleVerticalScreen davega_simple_vertical_screen_with_motor_current = DavegaSimpleVerticalScreen(SCR_MOTOR_CURRENT);
 #endif
 #ifdef REALTIME_STATS_SCREEN_ENABLED
 #include "davega_realtime_stat_screen.h"
@@ -124,8 +106,6 @@ DavegaScreen* davega_screens[] = {
 #endif
 };
 
-t_screen_item text_screen_items[] = TEXT_SCREEN_ITEMS;
-
 char* versionNumber = "1.0";
 t_davega_screen_config screen_config = {
   // TODO: fix issue with calling make_fw_version.
@@ -135,8 +115,7 @@ t_davega_screen_config screen_config = {
   SHOW_AVG_CELL_VOLTAGE,
   BATTERY_S,
   TEXT_SCREEN_BIG_FONT,
-  text_screen_items,
-  LEN(text_screen_items),
+  SCR_SPEED,
   SCREEN_ORIENTATION
 };
 

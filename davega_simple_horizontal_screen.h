@@ -27,14 +27,10 @@
 
 class DavegaSimpleHorizontalScreen: public DavegaILI9341Screen {
 public:
-    DavegaSimpleHorizontalScreen(t_screen_item primary_item) {
-      _primary_item = primary_item;
+    DavegaSimpleHorizontalScreen() {
       #ifdef SIMPLE_HORIZONTAL_SCREEN_ENABLED
       id = SIMPLE_HORIZONTAL_SCREEN_ENABLED;
       #endif
-    }
-    DavegaSimpleHorizontalScreen() {
-      DavegaSimpleHorizontalScreen(SCR_SPEED);
     }
     void reset();
     void update(t_davega_data* data);
@@ -49,8 +45,6 @@ protected:
     uint8_t _battery_cells_filled = 0;
 
     vesc_comm_fault_code _last_fault_code = FAULT_CODE_NONE;
-
-    t_screen_item _primary_item = _primary_item;
 
     void _update_battery_indicator(float battery_percent, bool redraw = false);
 };

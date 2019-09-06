@@ -21,6 +21,7 @@
 #include "davega_screen.h"
 #include "davega_util.h"
 #include "vesc_comm.h"
+#include "davega_config.h"
 #include "tft_util.h"
 #include <ILI9341_t3.h> // Hardware-specific library
 
@@ -39,8 +40,9 @@ void DavegaTextScreen::update(t_davega_data *data) {
     uint16_t capacity_data_color = progress_to_color(data->mah_reset_progress, _tft);
     float avg_speed_kph;
 
-    for (int i=0; i < _config->text_screen_items_count; i++) {
-        switch (_config->text_screen_items[i]) {
+    t_screen_item text_screen_items[] = TEXT_SCREEN_ITEMS;
+    for (int i=0; i < LEN(text_screen_items); i++) {
+        switch (text_screen_items[i]) {
             case SCR_FW_VERSION:
                 _write_text_line(_config->fw_version, i);
                 break;

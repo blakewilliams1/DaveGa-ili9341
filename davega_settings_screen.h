@@ -38,7 +38,7 @@ public:
     uint8_t handleTouchInput(t_davega_button_input* input);
 
 protected:
-    int primary_options[3] = {SCR_MOTOR_CURRENT, SCR_BATTERY_CURRENT, SCR_SPEED};
+    t_screen_item primary_options[3] = {SCR_SPEED, SCR_MOTOR_CURRENT, SCR_BATTERY_CURRENT};
     uint8_t _primary_options_index = 0;
     // Have we just reset the screen? Unset by the first update() call.
     bool _just_reset = false;

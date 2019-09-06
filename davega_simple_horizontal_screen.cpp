@@ -35,7 +35,7 @@ void DavegaSimpleHorizontalScreen::reset() {
     _tft->setCursor(258, 163);
     _tft->print("BATTERY V");
 
-    switch (_primary_item) {
+    switch (_config->primary_screen_item) {
         case SCR_BATTERY_CURRENT:
             _tft->setCursor(179, 167);
             _tft->print("BATTERY A");
@@ -77,8 +77,8 @@ void DavegaSimpleHorizontalScreen::update(t_davega_data *data) {
         reset();
 
     // primary display item
-    uint8_t value = primary_item_value(_primary_item, data, _config);
-    uint16_t color = primary_item_color(_primary_item, data, _config);
+    uint8_t value = primary_item_value(_config->primary_screen_item, data, _config);
+    uint16_t color = primary_item_color(_config->primary_screen_item, data, _config);
     dtostrf(value, 2, 0, fmt);
     tft_util_draw_number(_tft, fmt, 0, 0, color, ILI9341_BLACK, 7, 32);
 

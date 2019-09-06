@@ -32,7 +32,7 @@ void DavegaSettingsScreen::reset() {
   _tft->setTextColor(ILI9341_WHITE);
   _tft->setCursor(20, 20);
   _tft->print(_config->use_fahrenheit ? "Fahrenheit" : "Celcius");
-  _tft->fillRect(20, 35, 60, 40, ILI9341_WHITE); 
+  _tft->fillRect(20, 35, 55, 40, ILI9341_WHITE); 
   _tft->setTextColor(ILI9341_BLACK);
   _tft->setCursor(35, 45);
   _tft->print("Temp");
@@ -41,25 +41,25 @@ void DavegaSettingsScreen::reset() {
 
   // Other units
   _tft->setTextColor(ILI9341_WHITE);
-  _tft->setCursor(100, 20);
+  _tft->setCursor(95, 20);
   _tft->print(_config->imperial_units ? "Imperial" : "Metric");
-  _tft->fillRect(100, 35, 60, 40, ILI9341_WHITE); 
+  _tft->fillRect(95, 35, 55, 40, ILI9341_WHITE); 
   _tft->setTextColor(ILI9341_BLACK);
-  _tft->setCursor(110, 45);
+  _tft->setCursor(105, 45);
   _tft->print("Other");
-  _tft->setCursor(112, 55);
+  _tft->setCursor(107, 55);
   _tft->print("Units");
 
   // Primary menu item
   _tft->setTextColor(ILI9341_WHITE);
-  _tft->setCursor(185, 20);
+  _tft->setCursor(175, 20);
   char const* primary_item_label;
-  switch(primary_options[_primary_options_index]) {
+  switch(_config->primary_screen_item) {
     case SCR_MOTOR_CURRENT:
-      primary_item_label = "Motor Current";
+      primary_item_label = "Motor Amp";
       break;
     case SCR_BATTERY_CURRENT:
-      primary_item_label = "Bat Current";
+      primary_item_label = "Bat Amp";
       break;
     case SCR_SPEED:
       primary_item_label = "Speed";
@@ -67,16 +67,27 @@ void DavegaSettingsScreen::reset() {
     default: primary_item_label = "?";
   }
   _tft->print(primary_item_label);
-  _tft->fillRect(185, 35, 60, 40, ILI9341_WHITE); 
+  _tft->fillRect(175, 35, 55, 40, ILI9341_WHITE); 
   _tft->setTextColor(ILI9341_BLACK);
-  _tft->setCursor(195, 45);
+  _tft->setCursor(183, 45);
   _tft->print("Primary");
-  _tft->setCursor(197, 55);
+  _tft->setCursor(183, 55);
   _tft->print("Element");
+
+  // Screen Orientation
+  /*_tft->setTextColor(ILI9341_WHITE);
+  _tft->setCursor(100, 20);
+  _tft->print(_config->imperial_units ? "Imperial" : "Metric");
+  _tft->fillRect(100, 35, 60, 40, ILI9341_WHITE); 
+  _tft->setTextColor(ILI9341_BLACK);
+  _tft->setCursor(110, 45);
+  _tft->print("Other");
+  _tft->setCursor(112, 55);
+  _tft->print("Units");*/
 
   // Navigation label
   _tft->setTextColor(ILI9341_WHITE);
-  _tft->setCursor(15, 100);
+  _tft->setCursor(20, 100);
   _tft->print("Navigation");
 
   // Simple horizontal screen navigation
@@ -211,6 +222,7 @@ uint8_t DavegaSettingsScreen::handleTouchInput(t_davega_button_input* input) {
     trigger_redraw = true;
     _primary_options_index++;
     if (_primary_options_index > 2) _primary_options_index = 0;
+    _config->primary_screen_item = primary_options[_primary_options_index];
   }
 
   if (trigger_redraw) { 
