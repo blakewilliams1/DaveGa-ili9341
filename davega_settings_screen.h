@@ -42,6 +42,11 @@ protected:
     uint8_t _primary_options_index = 0;
     // Have we just reset the screen? Unset by the first update() call.
     bool _just_reset = false;
+    Button temp_units_coords = {20, 35, 55, 40};
+    Button other_units_coords = {95, 35, 55, 40};
+    Button primary_value_coords = {170, 35, 55, 40};
+    Button rotate_screen_coords = {245, 35, 55, 40};
+
     Button simple_horizontal_coords = {20, 115, 70, 40};
     Button simple_vertical_coords = {120, 115, 70, 40};
     Button text_screen_coords = {220, 115, 70, 40};

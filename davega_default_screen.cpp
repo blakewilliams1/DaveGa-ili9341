@@ -145,9 +145,14 @@ void DavegaDefaultScreen::_draw_labels() {
     _tft->setCursor(132, 239);
     _tft->print("TOTAL");
 
-    _tft->fillRect(112, 295, 123, 20, ILI9341_WHITE);
+    _tft->fillRect(5, 295, 110, 20, ILI9341_WHITE);
     _tft->setTextColor(ILI9341_BLACK);
-    _tft->setCursor(150, 300);
+    _tft->setCursor(20, 300);
+    _tft->print("Flip Screen");
+
+    _tft->fillRect(125, 295, 110, 20, ILI9341_WHITE);
+    _tft->setTextColor(ILI9341_BLACK);
+    _tft->setCursor(160, 300);
     _tft->print("Settings");
 
     _tft->setTextColor(ILI9341_WHITE);
@@ -246,8 +251,18 @@ void DavegaDefaultScreen::_update_speed_indicator(float speed_percent, bool redr
 }
 
 uint8_t DavegaDefaultScreen::handleTouchInput(t_davega_button_input* input) {
-  if (input->touch_x > 112 && input->touch_y > 295) {
+  // Flip screen 180 degrees.
+  if (input->touch_x <= 120 && input->touch_y > 290) {
+    _config->orientation = (_config->orientation + 2) % 4;
+    _tft->setRotation(_config->orientation);
+    reset();
+  }
+
+  // Navigate to settings menu.
+  if (input->touch_x > 120 && input->touch_y > 290) {
     #ifdef SETTINGS_SCREEN_ENABLED
+    _config->orientation = LANDSCAPE_ORIENTATION;
+    _tft->setRotation(_config->orientation);
     return SETTINGS_SCREEN_ENABLED;
     #endif
   }

@@ -54,6 +54,12 @@ void DavegaSimpleVerticalScreen::reset() {
     }
 
     // Draw settings button.
+    _tft->fillRect(3, 295, 111, 20, ILI9341_WHITE);
+    _tft->setTextColor(ILI9341_BLACK);
+    _tft->setCursor(20, 300);
+    _tft->print("Flip Screen");
+
+    // Draw settings button.
     _tft->fillRect(123, 295, 111, 20, ILI9341_WHITE);
     _tft->setTextColor(ILI9341_BLACK);
     _tft->setCursor(160, 300);
@@ -151,8 +157,17 @@ void DavegaSimpleVerticalScreen::heartbeat(uint32_t duration_ms, bool successful
 }
 
 uint8_t DavegaSimpleVerticalScreen::handleTouchInput(t_davega_button_input* input) {
+  // Rotate the screen 180 degrees.
+  if (input->touch_x < 120 && input->touch_y > 280) {
+    _config->orientation = (_config->orientation + 2) % 4;
+    _tft->setRotation(_config->orientation);
+    reset();
+  }
+
   if (input->touch_x > 120 && input->touch_y > 280) {
     #ifdef SETTINGS_SCREEN_ENABLED
+    _config->orientation = LANDSCAPE_ORIENTATION;
+    _tft->setRotation(_config->orientation);
     return SETTINGS_SCREEN_ENABLED;
     #endif
   }

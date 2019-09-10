@@ -207,8 +207,10 @@ uint8_t DavegaRealtimeStatScreen::handleTouchInput(t_davega_button_input* input)
     }
   } else {
     // Navigate to settings menu.
-    if (input->touch_x > 215 && input->touch_y > 220 && since_last_switch > 1000) {
+    if (input->touch_x > 215 && input->touch_y > 210 && since_last_switch > 1000) {
       #ifdef SETTINGS_SCREEN_ENABLED
+      _config->orientation = LANDSCAPE_ORIENTATION;
+      _tft->setRotation(_config->orientation);
       return SETTINGS_SCREEN_ENABLED;
       #endif
     }

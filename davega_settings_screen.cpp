@@ -30,29 +30,39 @@ void DavegaSettingsScreen::reset() {
 
   // Temp units
   _tft->setTextColor(ILI9341_WHITE);
-  _tft->setCursor(20, 20);
+  _tft->setCursor(temp_units_coords.x, temp_units_coords.y - 15);
   _tft->print(_config->use_fahrenheit ? "Fahrenheit" : "Celcius");
-  _tft->fillRect(20, 35, 55, 40, ILI9341_WHITE); 
+  _tft->fillRect(
+    temp_units_coords.x,
+    temp_units_coords.y,
+    temp_units_coords.width,
+    temp_units_coords.height,
+    ILI9341_WHITE); 
   _tft->setTextColor(ILI9341_BLACK);
-  _tft->setCursor(35, 45);
+  _tft->setCursor(temp_units_coords.x + 10, temp_units_coords.y + 10);
   _tft->print("Temp");
-  _tft->setCursor(33, 55);
+  _tft->setCursor(temp_units_coords.x + 13, temp_units_coords.y + 20);
   _tft->print("Units");
 
   // Other units
   _tft->setTextColor(ILI9341_WHITE);
-  _tft->setCursor(95, 20);
+  _tft->setCursor(other_units_coords.x, other_units_coords.y - 15);
   _tft->print(_config->imperial_units ? "Imperial" : "Metric");
-  _tft->fillRect(95, 35, 55, 40, ILI9341_WHITE); 
+  _tft->fillRect(
+    other_units_coords.x,
+    other_units_coords.y,
+    other_units_coords.width,
+    other_units_coords.height,
+    ILI9341_WHITE); 
   _tft->setTextColor(ILI9341_BLACK);
-  _tft->setCursor(105, 45);
+  _tft->setCursor(other_units_coords.x + 10, other_units_coords.y + 10);
   _tft->print("Other");
-  _tft->setCursor(107, 55);
+  _tft->setCursor(other_units_coords.x + 12, other_units_coords.y  + 20);
   _tft->print("Units");
 
   // Primary menu item
   _tft->setTextColor(ILI9341_WHITE);
-  _tft->setCursor(175, 20);
+  _tft->setCursor(primary_value_coords.x, primary_value_coords.y - 15);
   char const* primary_item_label;
   switch(_config->primary_screen_item) {
     case SCR_MOTOR_CURRENT:
@@ -67,23 +77,31 @@ void DavegaSettingsScreen::reset() {
     default: primary_item_label = "?";
   }
   _tft->print(primary_item_label);
-  _tft->fillRect(175, 35, 55, 40, ILI9341_WHITE); 
+  _tft->fillRect(
+    primary_value_coords.x,
+    primary_value_coords.y,
+    primary_value_coords.width,
+    primary_value_coords.height,
+    ILI9341_WHITE); 
   _tft->setTextColor(ILI9341_BLACK);
-  _tft->setCursor(183, 45);
+  _tft->setCursor(primary_value_coords.x + 5, primary_value_coords.y + 10);
   _tft->print("Primary");
-  _tft->setCursor(183, 55);
-  _tft->print("Element");
+  _tft->setCursor(primary_value_coords.x + 8, primary_value_coords.y + 20);
+  _tft->print("Value");
 
   // Screen Orientation
-  /*_tft->setTextColor(ILI9341_WHITE);
-  _tft->setCursor(100, 20);
-  _tft->print(_config->imperial_units ? "Imperial" : "Metric");
-  _tft->fillRect(100, 35, 60, 40, ILI9341_WHITE); 
+  _tft->setTextColor(ILI9341_WHITE);
+  _tft->fillRect(
+    rotate_screen_coords.x,
+    rotate_screen_coords.y,
+    rotate_screen_coords.width,
+    rotate_screen_coords.height,
+    ILI9341_WHITE); 
   _tft->setTextColor(ILI9341_BLACK);
-  _tft->setCursor(110, 45);
-  _tft->print("Other");
-  _tft->setCursor(112, 55);
-  _tft->print("Units");*/
+  _tft->setCursor(rotate_screen_coords.x + 10, rotate_screen_coords.y + 10);
+  _tft->print("Flip");
+  _tft->setCursor(rotate_screen_coords.x + 10, rotate_screen_coords.y + 20);
+  _tft->print("Screen");
 
   // Navigation label
   _tft->setTextColor(ILI9341_WHITE);
@@ -203,26 +221,40 @@ void DavegaSettingsScreen::heartbeat(uint32_t duration_ms, bool successful_vesc_
 }
 
 uint8_t DavegaSettingsScreen::handleTouchInput(t_davega_button_input* input) {
-  // TODO process more touch input.
   // Toggle temp units.
   bool trigger_redraw = false;
-  if (input->touch_x > 10 && input->touch_x < 80 && input->touch_y < 80) {
+  if (input->touch_x > temp_units_coords.x - 10 &&
+      input->touch_x < temp_units_coords.x + 60 &&
+      input->touch_y < temp_units_coords.y + 45) {
     _config->use_fahrenheit = !_config->use_fahrenheit;
     trigger_redraw = true;
   }
 
   // Toggle other units.
-  if (input->touch_x >= 80 && input->touch_x < 160 && input->touch_y < 80) {
+  if (input->touch_x > other_units_coords.x - 10 &&
+      input->touch_x < other_units_coords.x + 60 &&
+      input->touch_y < other_units_coords.y + 45) {
     _config->imperial_units = !_config->imperial_units;
     trigger_redraw = true;
   }
 
   // Increment primary element choice.
-  if (input->touch_x >= 160 && input->touch_x < 240 && input->touch_y < 80) {
+  if (input->touch_x > primary_value_coords.x - 10 &&
+      input->touch_x < primary_value_coords.x + 60 &&
+      input->touch_y < primary_value_coords.y + 45) {
     trigger_redraw = true;
     _primary_options_index++;
     if (_primary_options_index > 2) _primary_options_index = 0;
     _config->primary_screen_item = primary_options[_primary_options_index];
+  }
+
+  // Flip screen 180 degrees.
+  if (input->touch_x > rotate_screen_coords.x - 10 &&
+      input->touch_x < rotate_screen_coords.x + 60 &&
+      input->touch_y < rotate_screen_coords.y + 45) {
+    _config->orientation = (_config->orientation + 2) % 4;
+    _tft->setRotation(_config->orientation);
+    reset();
   }
 
   if (trigger_redraw) { 
@@ -245,6 +277,8 @@ uint8_t DavegaSettingsScreen::handleTouchInput(t_davega_button_input* input) {
       input->touch_y > simple_vertical_coords.y - 5 &&
       input->touch_y < simple_vertical_coords.y + 45) {
     #ifdef SIMPLE_VERTICAL_SCREEN_ENABLED
+    _config->orientation = PORTRAIT_ORIENTATION;
+    _tft->setRotation(_config->orientation);
     return SIMPLE_VERTICAL_SCREEN_ENABLED;
     #endif
   }
@@ -275,6 +309,8 @@ uint8_t DavegaSettingsScreen::handleTouchInput(t_davega_button_input* input) {
       input->touch_y > default_screen_coords.y - 5 &&
       input->touch_y < default_screen_coords.y + 45) {
     #ifdef DEFAULT_SCREEN_ENABLED
+    _config->orientation = PORTRAIT_ORIENTATION;
+    _tft->setRotation(_config->orientation);
     return DEFAULT_SCREEN_ENABLED;
     #endif
   }

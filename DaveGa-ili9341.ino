@@ -52,6 +52,10 @@ VescCommStandard vesc_comm = VescCommStandard();
 #include "davega_settings_screen.h"
 DavegaSettingsScreen davega_settings_screen = DavegaSettingsScreen();
 #endif
+#ifdef VERTICAL_SETTINGS_SCREEN_ENABLED
+#include "davega_vertical_settings_screen.h"
+DavegaVerticalSettingsScreen davega_vertical_settings_screen = DavegaVerticalSettingsScreen();
+#endif
 #ifdef DEFAULT_SCREEN_ENABLED
 #include "davega_default_screen.h"
 DavegaDefaultScreen davega_default_screen = DavegaDefaultScreen();
@@ -83,20 +87,11 @@ DavegaScreen* davega_screens[] = {
 #ifdef SIMPLE_HORIZONTAL_SCREEN_ENABLED
   &davega_simple_horizontal_screen,
 #endif
-#ifdef SIMPLE_HORIZONTAL_SCREEN_WITH_BATTERY_CURRENT_ENABLED
-  &davega_simple_horizontal_screen_with_battery_current,
-#endif
-#ifdef SIMPLE_HORIZONTAL_SCREEN_WITH_MOTOR_CURRENT_ENABLED
-  &davega_simple_horizontal_screen_with_motor_current,
+#ifdef VERTICAL_SETTINGS_SCREEN_ENABLED
+  &davega_vertical_settings_screen,
 #endif
 #ifdef SIMPLE_VERTICAL_SCREEN_ENABLED
   &davega_simple_vertical_screen,
-#endif
-#ifdef SIMPLE_VERTICAL_SCREEN_WITH_BATTERY_CURRENT_ENABLED
-  &davega_simple_vertical_screen_with_battery_current,
-#endif
-#ifdef SIMPLE_VERTICAL_SCREEN_WITH_MOTOR_CURRENT_ENABLED
-  &davega_simple_vertical_screen_with_motor_current,
 #endif
 #ifdef REALTIME_STATS_SCREEN_ENABLED
   &davega_realtime_stats_screen_motor_current,
@@ -265,7 +260,7 @@ void setup() {
   initial_total_meters -= tachometer;
 }
 
-void set_screen(int screen_id, int primary_item) {
+void set_screen(int screen_id) {
   for (unsigned int i = 0; i < LEN(davega_screens); i++) {
     if (screen_id == davega_screens[i]->id) {
       scr = davega_screens[i];
@@ -305,12 +300,22 @@ void loop() {
     touch_screen.read();
     // Touch screen library gives coordinates from lower right corner
     // of screen, so fix it depending on orientation.
-    if (SCREEN_ORIENTATION == 1 || SCREEN_ORIENTATION == 3) {
-      touch_x = 320 - (int16_t)touch_screen.getX();
-      touch_y = 240 - (int16_t)touch_screen.getY();
+    if (screen_config.orientation % 2 == LANDSCAPE_ORIENTATION) {
+      if (screen_config.orientation == 3) {
+        touch_x = (int16_t)touch_screen.getX();
+        touch_y = (int16_t)touch_screen.getY();
+      } else {
+        touch_x = 320 - (int16_t)touch_screen.getX();
+        touch_y = 240 - (int16_t)touch_screen.getY();
+      }
     } else {
-      touch_x = 240 - (int16_t)touch_screen.getY();
-      touch_y = 320 - (int16_t)touch_screen.getX();
+      if (screen_config.orientation == 0) {
+        touch_x = (int16_t)touch_screen.getY();
+        touch_y = 320 - (int16_t)touch_screen.getX();
+      } else {
+        touch_x = 240 - (int16_t)touch_screen.getY();
+        touch_y = (int16_t)touch_screen.getX();
+      }
     }
   }
 
@@ -327,32 +332,37 @@ void loop() {
   switch (navigationCommand) {
     #ifdef SIMPLE_HORIZONTAL_SCREEN_ENABLED
     case SIMPLE_HORIZONTAL_SCREEN_ENABLED:
-    set_screen(SIMPLE_HORIZONTAL_SCREEN_ENABLED, 0);
+    set_screen(SIMPLE_HORIZONTAL_SCREEN_ENABLED);
     break;
     #endif
     #ifdef SIMPLE_VERTICAL_SCREEN_ENABLED
     case SIMPLE_VERTICAL_SCREEN_ENABLED:
-    set_screen(SIMPLE_VERTICAL_SCREEN_ENABLED, 0);
+    set_screen(SIMPLE_VERTICAL_SCREEN_ENABLED);
     break;
     #endif
     #ifdef TEXT_SCREEN_ENABLED
     case TEXT_SCREEN_ENABLED:
-    set_screen(TEXT_SCREEN_ENABLED, 0);
+    set_screen(TEXT_SCREEN_ENABLED);
     break;
     #endif
     #ifdef REALTIME_STATS_SCREEN_ENABLED
     case REALTIME_STATS_SCREEN_ENABLED:
-    set_screen(REALTIME_STATS_SCREEN_ENABLED, 0);
+    set_screen(REALTIME_STATS_SCREEN_ENABLED);
     break;
     #endif
     #ifdef DEFAULT_SCREEN_ENABLED
     case DEFAULT_SCREEN_ENABLED:
-    set_screen(DEFAULT_SCREEN_ENABLED, 0);
+    set_screen(DEFAULT_SCREEN_ENABLED);
     break;
     #endif
     #ifdef SETTINGS_SCREEN_ENABLED
     case SETTINGS_SCREEN_ENABLED:
-    set_screen(SETTINGS_SCREEN_ENABLED, 0);
+    set_screen(SETTINGS_SCREEN_ENABLED);
+    break;
+    #endif
+    #ifdef VERTICAL_SETTINGS_SCREEN_ENABLED
+    case VERTICAL_SETTINGS_SCREEN_ENABLED:
+    set_screen(VERTICAL_SETTINGS_SCREEN_ENABLED);
     break;
     #endif
   }

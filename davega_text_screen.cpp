@@ -33,6 +33,12 @@ void DavegaTextScreen::reset() {
   _tft->setTextColor(ILI9341_BLACK);
   _tft->setCursor(240, 223);
   _tft->print("Settings");
+
+  // Draw flip screen button.
+  _tft->fillRect(100, 215, 101, 20, ILI9341_WHITE);
+  _tft->setTextColor(ILI9341_BLACK);
+  _tft->setCursor(120, 223);
+  _tft->print("Flip Screen");
 }
 
 void DavegaTextScreen::update(t_davega_data *data) {
@@ -125,9 +131,9 @@ void DavegaTextScreen::update(t_davega_data *data) {
 
 void DavegaTextScreen::heartbeat(uint32_t duration_ms, bool successful_vesc_read) {
     uint16_t color = successful_vesc_read ? ILI9341_GREEN :ILI9341_RED;
-    _tft->fillRect(167, 5, 4, 4, color);
+    _tft->fillRect(167, 5, 6, 6, color);
     delay(duration_ms);
-    _tft->fillRect(167, 5, 4, 4, ILI9341_BLACK);
+    _tft->fillRect(167, 5, 6, 6, ILI9341_BLACK);
 }
 
 void DavegaTextScreen::_write_numeric_line(
@@ -194,10 +200,18 @@ void DavegaTextScreen::_write_line_buffer(int lineno, uint16_t color) {
 }
 
 uint8_t DavegaTextScreen::handleTouchInput(t_davega_button_input* input) {
+  // Navigate to settings menu.
   if (input->touch_x > 205 && input->touch_y > 205) {
     #ifdef SETTINGS_SCREEN_ENABLED
     return SETTINGS_SCREEN_ENABLED;
     #endif
+  }
+
+  // Flip screen 180 degrees.
+  if (input->touch_x > 90 && input->touch_x <= 205 && input->touch_y > 205) {
+    _config->orientation = (_config->orientation + 2) % 4;
+    _tft->setRotation(_config->orientation);
+    reset();
   }
   return 0;
 }

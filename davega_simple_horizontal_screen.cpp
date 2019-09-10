@@ -20,6 +20,7 @@
 #include "davega_simple_horizontal_screen.h"
 #include "davega_screen.h"
 #include "davega_util.h"
+#include "davega_config.h"
 #include "vesc_comm.h"
 #include "tft_util.h"
 #include <ILI9341_t3.h> // Hardware-specific library
@@ -53,7 +54,7 @@ void DavegaSimpleHorizontalScreen::reset() {
     _tft->setTextColor(ILI9341_BLACK);
     _tft->fillRect(2, 220, 101, 20, ILI9341_WHITE);
     _tft->setCursor(30, 227);
-    _tft->print("BUTTON 1");
+    _tft->print("Flip Screen");
 
     _tft->fillRect(109, 220, 101, 20, ILI9341_WHITE);
     _tft->setCursor(137, 227);
@@ -152,8 +153,17 @@ void DavegaSimpleHorizontalScreen::heartbeat(uint32_t duration_ms, bool successf
 }
 
 uint8_t DavegaSimpleHorizontalScreen::handleTouchInput(t_davega_button_input* input) {
+  // Rotate the screen 180 degrees.
+  if (input->touch_x < 103 && input->touch_y > 210) {
+    _config->orientation = (_config->orientation + 2) % 4;
+    _tft->setRotation(_config->orientation);
+    reset();
+  }
+
   if (input->touch_x > 215 && input->touch_y > 210) {
     #ifdef SETTINGS_SCREEN_ENABLED
+    _config->orientation = LANDSCAPE_ORIENTATION;
+    _tft->setRotation(_config->orientation);
     return SETTINGS_SCREEN_ENABLED;
     #endif
   }
