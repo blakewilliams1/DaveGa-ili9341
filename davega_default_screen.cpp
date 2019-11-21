@@ -194,7 +194,7 @@ void DavegaDefaultScreen::_draw_battery_cell(int index, bool filled, bool redraw
 }
 
 void DavegaDefaultScreen::_update_battery_indicator(float battery_percent, bool redraw) {
-    int cells_to_fill = round(battery_percent * LEN(BATTERY_INDICATOR_CELLS));
+    unsigned int cells_to_fill = round(max(battery_percent, 0) * LEN(BATTERY_INDICATOR_CELLS));
     if (redraw) {
         for (unsigned int i = 0; i < LEN(BATTERY_INDICATOR_CELLS); i++)
             _draw_battery_cell(i, i < cells_to_fill, true);
@@ -234,7 +234,7 @@ void DavegaDefaultScreen::_draw_speed_cell(int index, bool filled, bool redraw) 
 void DavegaDefaultScreen::_update_speed_indicator(float speed_percent, bool redraw) {
     int cells_to_fill = round(speed_percent * LEN(SPEED_INDICATOR_CELLS));
     if (redraw) {
-        for (unsigned int i = 0; i < LEN(SPEED_INDICATOR_CELLS); i++)
+        for (int i = 0; i < LEN(SPEED_INDICATOR_CELLS); i++)
             _draw_speed_cell(i, i < cells_to_fill, true);
     }
     else {

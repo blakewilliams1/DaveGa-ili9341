@@ -149,7 +149,6 @@ void DavegaRealtimeStatScreen::_update_battery_indicator(float battery_percent, 
   _tft->setTextColor(ILI9341_WHITE);
   _tft->setCursor(60, 230);
   _tft->print(String(battery_percent * 100) + "%");
-  // TODO make cool battery icon.
 }
 
 void DavegaRealtimeStatScreen::heartbeat(uint32_t duration_ms, bool successful_vesc_read) {
@@ -179,6 +178,13 @@ void DavegaRealtimeStatScreen::draw_graph_menu() {
 }
 
 uint8_t DavegaRealtimeStatScreen::handleTouchInput(t_davega_button_input* input) {
+  _tft->fillRect(120, 100, 100, 50, ILI9341_BLUE);
+  _tft->setCursor(130, 110);
+  _tft->print(input->touched);
+  _tft->setCursor(130, 120);
+  _tft->print(input->touch_x);
+  _tft->setCursor(130, 130);
+  _tft->print(input->touch_y);
   if (input->touch_x > 0 && input->touch_y > 0) {
     _last_press = millis();
   }
@@ -192,7 +198,8 @@ uint8_t DavegaRealtimeStatScreen::handleTouchInput(t_davega_button_input* input)
       if (input->touch_x > x - 20 &&
           input->touch_x < x + 120 &&
           input->touch_y > y - 20 &&
-          input->touch_y < y + 35) {
+          input->touch_y < y + 35 &&
+          since_last_switch > 1000) {
         graph_elements[i].visible = !graph_elements[i].visible;
         _last_press = millis();
         draw_graph_menu();

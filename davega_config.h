@@ -129,6 +129,8 @@
 
 // 0=portrait, 1=right rotated landscape, 2=reverse portrait, 3=left rotated landscape
 #define SCREEN_ORIENTATION 1
+#define LANDSCAPE_ORIENTATION 1
+#define PORTRAIT_ORIENTATION 0
 
 // Screens. Uncomment the ones you want enabled.
 #define SETTINGS_SCREEN_ENABLED 1
@@ -136,7 +138,8 @@
 #define SIMPLE_HORIZONTAL_SCREEN_ENABLED 3
 #define SIMPLE_VERTICAL_SCREEN_ENABLED 4
 #define REALTIME_STATS_SCREEN_ENABLED 5
-#define TEXT_SCREEN_ENABLED 6
+#define LED_CONTROLLER_SCREEN_ENABLED 6
+#define TEXT_SCREEN_ENABLED 7
 
 // Information to be displayed on the text screen. Only relevant if TEXT_SCREEN_ENABLED is set.
 // Available options:
@@ -180,8 +183,7 @@
     SCR_TIME_RIDING, \
 }
 
-// Big font is only recommended for landscape orientation. 9 lines fit on the screen then.
-// Some items overflow the right order. You may want to adjust the labels in davega_text_screen.cpp.
+// Big font is only recommended for landscape orientation.
 #define TEXT_SCREEN_BIG_FONT true
 
 #endif //DAVEGA_DAVEGA_CONFIG_H

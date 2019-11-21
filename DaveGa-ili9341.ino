@@ -36,6 +36,7 @@
 #define D(x)
 #endif
 
+// 15, 16, 17 on Teensy 4.0
 #define BUTTON_1_PIN A3
 #define BUTTON_2_PIN A2
 #define BUTTON_3_PIN A1
@@ -70,7 +71,13 @@ DavegaSimpleVerticalScreen davega_simple_vertical_screen = DavegaSimpleVerticalS
 #endif
 #ifdef REALTIME_STATS_SCREEN_ENABLED
 #include "davega_realtime_stat_screen.h"
-DavegaRealtimeStatScreen davega_realtime_stats_screen_motor_current = DavegaRealtimeStatScreen();
+DavegaRealtimeStatScreen davega_realtime_stats_screen = DavegaRealtimeStatScreen();
+#endif
+#ifdef LED_CONTROLLER_SCREEN_ENABLED
+#include "led_controller.h"
+LedController* led_controller = new LedController();
+#include "davega_led_controller_screen.h"
+DavegaLedControllerScreen davega_led_controller_screen = DavegaLedControllerScreen(led_controller);
 #endif
 #ifdef TEXT_SCREEN_ENABLED
 #include "davega_text_screen.h"
@@ -78,6 +85,12 @@ DavegaTextScreen davega_text_screen = DavegaTextScreen();
 #endif
 
 DavegaScreen* davega_screens[] = {
+#ifdef REALTIME_STATS_SCREEN_ENABLED
+  &davega_realtime_stats_screen,
+#endif
+#ifdef LED_CONTROLLER_SCREEN_ENABLED
+  &davega_led_controller_screen,
+#endif
 #ifdef SETTINGS_SCREEN_ENABLED
   &davega_settings_screen,
 #endif
@@ -92,9 +105,6 @@ DavegaScreen* davega_screens[] = {
 #endif
 #ifdef SIMPLE_VERTICAL_SCREEN_ENABLED
   &davega_simple_vertical_screen,
-#endif
-#ifdef REALTIME_STATS_SCREEN_ENABLED
-  &davega_realtime_stats_screen_motor_current,
 #endif
 #ifdef TEXT_SCREEN_ENABLED
   &davega_text_screen,
@@ -132,6 +142,7 @@ int32_t last_eeprom_update_on_stop;
 int32_t last_rpm;
 uint32_t button_1_last_up_time = 0;
 uint32_t button_2_last_up_time = 0;
+bool is_touched_prev = false;
 
 int32_t rotations_to_meters(int32_t rotations) {
   float gear_ratio = float(WHEEL_PULLEY_TEETH) / float(MOTOR_PULLEY_TEETH);
@@ -214,6 +225,14 @@ void setup() {
 
   scr->reset();
   scr->update(&data);
+  #ifdef LED_CONTROLLER_SCREEN_ENABLED
+  
+  if ((millis() / 1000) % 2 == 0) {
+    digitalWrite(30, HIGH);
+  }
+
+  led_controller->update(&data);
+  #endif
 
   // TODO: Remove this after testing.
   //while(true)scr->update(&data);
@@ -269,66 +288,7 @@ void set_screen(int screen_id) {
   }
 }
 
-void loop() {
-  bool button_1_pressed = false;
-  bool button_2_pressed = false;
-  bool button_3_pressed = false;
-  if (digitalRead(BUTTON_3_PIN) == LOW) {
-    button_3_pressed = true;
-    current_screen_index = (current_screen_index + 1) % LEN(davega_screens);
-    scr = davega_screens[current_screen_index];
-    scr->reset();
-    delay(UPDATE_DELAY);
-  }
-
-  if (digitalRead(BUTTON_1_PIN) == HIGH) {
-    button_1_pressed = true;
-    button_1_last_up_time = millis();
-  }
-
-  if (digitalRead(BUTTON_2_PIN) == HIGH) {
-    button_2_pressed = true;
-    button_2_last_up_time = millis();
-  }
-
-  // Process touch input and send to the screen for interpretting.
-  int touch_x = 0;
-  int touch_y = 0;
-  bool is_touched = false;
-  if (touch_screen.dataAvailable()) {
-    is_touched = true;
-    touch_screen.read();
-    // Touch screen library gives coordinates from lower right corner
-    // of screen, so fix it depending on orientation.
-    if (screen_config.orientation % 2 == LANDSCAPE_ORIENTATION) {
-      if (screen_config.orientation == 3) {
-        touch_x = (int16_t)touch_screen.getX();
-        touch_y = (int16_t)touch_screen.getY();
-      } else {
-        touch_x = 320 - (int16_t)touch_screen.getX();
-        touch_y = 240 - (int16_t)touch_screen.getY();
-      }
-    } else {
-      if (screen_config.orientation == 0) {
-        touch_x = (int16_t)touch_screen.getY();
-        touch_y = 320 - (int16_t)touch_screen.getX();
-      } else {
-        touch_x = 240 - (int16_t)touch_screen.getY();
-        touch_y = (int16_t)touch_screen.getX();
-      }
-    }
-  }
-
-  // Process current screen's touch input and hardware button input.
-  t_davega_button_input input = {
-    button_1_pressed,
-    button_2_pressed,
-    button_3_pressed,
-    is_touched,
-    touch_x,
-    touch_y
-  };
-  int navigationCommand = scr->handleTouchInput(&input);
+void navigateScreens(int navigationCommand) {
   switch (navigationCommand) {
     #ifdef SIMPLE_HORIZONTAL_SCREEN_ENABLED
     case SIMPLE_HORIZONTAL_SCREEN_ENABLED:
@@ -365,8 +325,90 @@ void loop() {
     set_screen(VERTICAL_SETTINGS_SCREEN_ENABLED);
     break;
     #endif
+    #ifdef LED_CONTROLLER_SCREEN_ENABLED
+    case LED_CONTROLLER_SCREEN_ENABLED:
+    set_screen(LED_CONTROLLER_SCREEN_ENABLED);
+    break;
+    #endif
+  }
+}
+
+void loop() {
+  bool button_1_pressed = false;
+  bool button_2_pressed = false;
+  bool button_3_pressed = false;
+  if (digitalRead(BUTTON_3_PIN) == LOW) {
+    button_3_pressed = true;
+    current_screen_index = (current_screen_index + 1) % LEN(davega_screens);
+    scr = davega_screens[current_screen_index];
+    scr->reset();
+    delay(UPDATE_DELAY);
   }
 
+  if (digitalRead(BUTTON_1_PIN) == HIGH) {
+    button_1_pressed = true;
+    button_1_last_up_time = millis();
+  }
+
+  if (digitalRead(BUTTON_2_PIN) == HIGH) {
+    button_2_pressed = true;
+    button_2_last_up_time = millis();
+  }
+
+  // Process touch input and send to the screen for interpretting.
+  int touch_x = 0;
+  int touch_y = 0;
+  bool is_touched = false;
+  if (touch_screen.dataAvailable()) {
+    touch_screen.read();
+    // Touch screen library gives coordinates from lower right corner
+    // of screen, so fix it depending on orientation.
+    if (screen_config.orientation % 2 == LANDSCAPE_ORIENTATION) {
+      if (screen_config.orientation == 3) {
+        touch_x = (int16_t)touch_screen.getX();
+        touch_y = (int16_t)touch_screen.getY();
+      } else {
+        touch_x = 320 - (int16_t)touch_screen.getX();
+        touch_y = 240 - (int16_t)touch_screen.getY();
+      }
+      // There was a false reading with coordinate outside of the screen.
+      if (touch_x > 320 || touch_y > 240) {
+        touch_x = 0;
+        touch_y = 0;
+      } else {
+        is_touched = true;
+      }
+    } else {
+      if (screen_config.orientation == 0) {
+        touch_x = (int16_t)touch_screen.getY();
+        touch_y = 320 - (int16_t)touch_screen.getX();
+      } else {
+        touch_x = 240 - (int16_t)touch_screen.getY();
+        touch_y = (int16_t)touch_screen.getX();
+      }
+      // There was a false reading with coordinate outside of the screen.
+      if (touch_x > 240 || touch_y > 320) {
+        touch_x = 0;
+        touch_y = 0;
+      } else {
+        is_touched = true;
+      }
+    }
+  }
+
+  // Process current screen's touch input and hardware button input.
+  t_davega_button_input input = {
+    button_1_pressed,
+    button_2_pressed,
+    button_3_pressed,
+    is_touched && !is_touched_prev,
+    touch_x,
+    touch_y
+  };
+  int navigationCommand = scr->handleTouchInput(&input);
+  navigateScreens(navigationCommand);
+
+  is_touched_prev = is_touched;
   vesc_comm.fetch_packet();
 
   if (!vesc_comm.is_expected_packet()) {
