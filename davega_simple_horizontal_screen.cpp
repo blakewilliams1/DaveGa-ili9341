@@ -28,6 +28,8 @@
 void DavegaSimpleHorizontalScreen::reset() {
     _tft->fillScreen(ILI9341_BLACK);
 
+    updateHighlighting(flip_screen_button, flip_screen_button, _tft);
+
     _tft->setTextColor(ILI9341_WHITE);
     _tft->setCursor(274, 42);
     _tft->print(_config->imperial_units ? "TRIP MI" : "TRIP KM");
@@ -52,7 +54,11 @@ void DavegaSimpleHorizontalScreen::reset() {
 
     // Draw the touch input buttons. Only needs to happen once, they don't update look.
     _tft->setTextColor(ILI9341_BLACK);
-    _tft->fillRect(2, 220, 101, 20, ILI9341_WHITE);
+    _tft->fillRect(
+				flip_screen_button.x,
+				flip_screen_button.y,
+				flip_screen_button.width,
+				flip_screen_button.height, ILI9341_WHITE);
     _tft->setCursor(30, 227);
     _tft->print("Flip Screen");
 
@@ -60,7 +66,11 @@ void DavegaSimpleHorizontalScreen::reset() {
     _tft->setCursor(137, 227);
     _tft->print("BUTTON 2");
 
-    _tft->fillRect(216, 220, 101, 20, ILI9341_WHITE);
+    _tft->fillRect(
+				settings_button.x,
+				settings_button.y,
+				settings_button.width,
+				settings_button.height, ILI9341_WHITE);
     _tft->setCursor(244, 227);
     _tft->print("Settings");
 
@@ -153,6 +163,31 @@ void DavegaSimpleHorizontalScreen::heartbeat(uint32_t duration_ms, bool successf
 }
 
 uint8_t DavegaSimpleHorizontalScreen::handleTouchInput(t_davega_button_input* input) {
+  if (input->button_1_pressed) {
+    Button oldButton = buttons[buttonCursor];
+    buttonCursor = (buttonCursor + 1) % LEN(buttons);
+    updateHighlighting(oldButton, buttons[buttonCursor], _tft);
+  } else if (input->button_3_pressed) {
+    Button oldButton = buttons[buttonCursor];
+    buttonCursor = (buttonCursor + LEN(buttons) - 1) % LEN(buttons);
+    updateHighlighting(oldButton, buttons[buttonCursor], _tft);
+  } else if (input->button_2_pressed) {
+    switch(buttonCursor) {
+      case 0: 
+        _config->orientation = (_config->orientation + 2) % 4;
+        _tft->setRotation(_config->orientation);
+        reset();
+        break;
+      case 1: 
+        #ifdef SETTINGS_SCREEN_ENABLED
+        _config->orientation = LANDSCAPE_ORIENTATION;
+        _tft->setRotation(_config->orientation);
+        return SETTINGS_SCREEN_ENABLED;
+        #endif
+        break;
+    }
+  }
+
   // Rotate the screen 180 degrees.
   if (input->touch_x < 103 && input->touch_y > 210) {
     _config->orientation = (_config->orientation + 2) % 4;

@@ -128,7 +128,8 @@
 #define UPDATE_DELAY 100  // ms
 
 // 0=portrait, 1=right rotated landscape, 2=reverse portrait, 3=left rotated landscape
-#define SCREEN_ORIENTATION 1
+#define SCREEN_ORIENTATION 3
+// The next two orientation variables don't change.
 #define LANDSCAPE_ORIENTATION 1
 #define PORTRAIT_ORIENTATION 0
 
@@ -138,7 +139,7 @@
 #define SIMPLE_HORIZONTAL_SCREEN_ENABLED 3
 #define SIMPLE_VERTICAL_SCREEN_ENABLED 4
 #define REALTIME_STATS_SCREEN_ENABLED 5
-#define LED_CONTROLLER_SCREEN_ENABLED 6
+//#define LED_CONTROLLER_SCREEN_ENABLED 6
 #define TEXT_SCREEN_ENABLED 7
 
 // Information to be displayed on the text screen. Only relevant if TEXT_SCREEN_ENABLED is set.

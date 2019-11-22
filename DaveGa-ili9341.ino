@@ -37,9 +37,9 @@
 #endif
 
 // 15, 16, 17 on Teensy 4.0
-#define BUTTON_1_PIN A3
-#define BUTTON_2_PIN A2
-#define BUTTON_3_PIN A1
+#define BUTTON_1_PIN 36
+#define BUTTON_2_PIN 35
+#define BUTTON_3_PIN 34
 
 #ifdef FOCBOX_UNITY
 #include "vesc_comm_unity.h"
@@ -49,6 +49,10 @@ VescCommUnity vesc_comm = VescCommUnity();
 VescCommStandard vesc_comm = VescCommStandard();
 #endif
 
+#ifdef REALTIME_STATS_SCREEN_ENABLED
+#include "davega_realtime_stat_screen.h"
+DavegaRealtimeStatScreen davega_realtime_stats_screen = DavegaRealtimeStatScreen();
+#endif
 #ifdef SETTINGS_SCREEN_ENABLED
 #include "davega_settings_screen.h"
 DavegaSettingsScreen davega_settings_screen = DavegaSettingsScreen();
@@ -69,10 +73,6 @@ DavegaSimpleHorizontalScreen davega_simple_horizontal_screen = DavegaSimpleHoriz
 #include "davega_simple_vertical_screen.h"
 DavegaSimpleVerticalScreen davega_simple_vertical_screen = DavegaSimpleVerticalScreen(SCR_SPEED);
 #endif
-#ifdef REALTIME_STATS_SCREEN_ENABLED
-#include "davega_realtime_stat_screen.h"
-DavegaRealtimeStatScreen davega_realtime_stats_screen = DavegaRealtimeStatScreen();
-#endif
 #ifdef LED_CONTROLLER_SCREEN_ENABLED
 #include "led_controller.h"
 LedController* led_controller = new LedController();
@@ -91,9 +91,6 @@ DavegaScreen* davega_screens[] = {
 #ifdef LED_CONTROLLER_SCREEN_ENABLED
   &davega_led_controller_screen,
 #endif
-#ifdef SETTINGS_SCREEN_ENABLED
-  &davega_settings_screen,
-#endif
 #ifdef DEFAULT_SCREEN_ENABLED
   &davega_default_screen,
 #endif
@@ -105,6 +102,9 @@ DavegaScreen* davega_screens[] = {
 #endif
 #ifdef SIMPLE_VERTICAL_SCREEN_ENABLED
   &davega_simple_vertical_screen,
+#endif
+#ifdef SETTINGS_SCREEN_ENABLED
+  &davega_settings_screen,
 #endif
 #ifdef TEXT_SCREEN_ENABLED
   &davega_text_screen,
@@ -142,6 +142,7 @@ int32_t last_eeprom_update_on_stop;
 int32_t last_rpm;
 uint32_t button_1_last_up_time = 0;
 uint32_t button_2_last_up_time = 0;
+uint32_t button_3_last_up_time = 0;
 bool is_touched_prev = false;
 
 int32_t rotations_to_meters(int32_t rotations) {
@@ -333,27 +334,30 @@ void navigateScreens(int navigationCommand) {
   }
 }
 
+bool button_1_pressed_prev = false;
+bool button_2_pressed_prev = false;
+bool button_3_pressed_prev = false;
+
 void loop() {
   bool button_1_pressed = false;
   bool button_2_pressed = false;
   bool button_3_pressed = false;
   if (digitalRead(BUTTON_3_PIN) == LOW) {
     button_3_pressed = true;
-    current_screen_index = (current_screen_index + 1) % LEN(davega_screens);
-    scr = davega_screens[current_screen_index];
-    scr->reset();
-    delay(UPDATE_DELAY);
+    button_3_last_up_time = millis();
   }
 
-  if (digitalRead(BUTTON_1_PIN) == HIGH) {
+  if (digitalRead(BUTTON_1_PIN) == LOW) {
     button_1_pressed = true;
     button_1_last_up_time = millis();
   }
 
-  if (digitalRead(BUTTON_2_PIN) == HIGH) {
+  if (digitalRead(BUTTON_2_PIN) == LOW) {
     button_2_pressed = true;
     button_2_last_up_time = millis();
   }
+
+
 
   // Process touch input and send to the screen for interpretting.
   int touch_x = 0;
@@ -398,9 +402,9 @@ void loop() {
 
   // Process current screen's touch input and hardware button input.
   t_davega_button_input input = {
-    button_1_pressed,
-    button_2_pressed,
-    button_3_pressed,
+    button_1_pressed && !button_1_pressed_prev,
+    button_2_pressed && !button_2_pressed_prev,
+    button_3_pressed && !button_3_pressed_prev,
     is_touched && !is_touched_prev,
     touch_x,
     touch_y
@@ -430,19 +434,19 @@ void loop() {
   int32_t mah_spent = initial_mah_spent + vesc_mah_spent;
   int32_t mah = BATTERY_MAX_MAH * BATTERY_USABLE_CAPACITY - mah_spent;
 
-  uint32_t button_2_down_elapsed = millis() - button_2_last_up_time;
+  /*uint32_t button_2_down_elapsed = millis() - button_2_last_up_time;
   if (button_2_down_elapsed > COUNTER_RESET_TIME) {
     // reset coulomb counter
     mah = voltage_to_percent(data.voltage) * BATTERY_MAX_MAH * BATTERY_USABLE_CAPACITY;
     mah_spent = BATTERY_MAX_MAH * BATTERY_USABLE_CAPACITY - mah;
     eeprom_write_mah_spent(mah_spent);
     initial_mah_spent = mah_spent - vesc_mah_spent;
-  }
+  }*/
 
   data.mah = mah;
 
   // dim mAh if the counter is about to be reset
-  data.mah_reset_progress = min(1.0 * button_2_down_elapsed / COUNTER_RESET_TIME, 1.0);
+  //data.mah_reset_progress = min(1.0 * button_2_down_elapsed / COUNTER_RESET_TIME, 1.0);
 
   int32_t rpm = vesc_comm.get_rpm();
   data.speed_kph = max(erpm_to_kph(rpm), 0);
@@ -450,7 +454,8 @@ void loop() {
   int32_t tachometer = rotations_to_meters(vesc_comm.get_tachometer() / 6);
 
   uint32_t button_1_down_elapsed = millis() - button_1_last_up_time;
-  if (button_1_down_elapsed > COUNTER_RESET_TIME) {
+  //uint32_t button_3_down_elapsed = millis() - button_3_last_up_time;
+  /*if (button_1_down_elapsed > COUNTER_RESET_TIME) {
     // reset session
     session_data.trip_meters = 0;
     session_data.max_speed_kph = 0;
@@ -460,7 +465,7 @@ void loop() {
     eeprom_write_session_data(session_data);
     initial_trip_meters = -tachometer;
     initial_millis_elapsed = -millis();
-  }
+  }*/
 
   session_data.trip_meters = initial_trip_meters + tachometer;
   int32_t total_meters = initial_total_meters + tachometer;
@@ -508,4 +513,9 @@ void loop() {
 
   scr->update(&data);
   scr->heartbeat(UPDATE_DELAY, true);
+
+
+  button_1_pressed_prev = button_1_pressed;
+  button_2_pressed_prev = button_2_pressed;
+  button_3_pressed_prev = button_3_pressed;
 }

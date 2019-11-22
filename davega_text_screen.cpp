@@ -200,6 +200,30 @@ void DavegaTextScreen::_write_line_buffer(int lineno, uint16_t color) {
 }
 
 uint8_t DavegaTextScreen::handleTouchInput(t_davega_button_input* input) {
+  if (input->button_1_pressed) {
+    Button oldButton = buttons[buttonCursor];
+    buttonCursor = (buttonCursor + 1) % LEN(buttons);
+    updateHighlighting(oldButton, buttons[buttonCursor], _tft);
+  } else if (input->button_3_pressed) {
+    Button oldButton = buttons[buttonCursor];
+    buttonCursor = (buttonCursor + LEN(buttons) - 1) % LEN(buttons);
+    updateHighlighting(oldButton, buttons[buttonCursor], _tft);
+  } else if (input->button_2_pressed) {
+    switch(buttonCursor) {
+      case 0: 
+        _config->orientation = (_config->orientation + 2) % 4;
+        _tft->setRotation(_config->orientation);
+        reset();
+        break;
+      case 1: 
+        #ifdef SETTINGS_SCREEN_ENABLED
+        _config->orientation = LANDSCAPE_ORIENTATION;
+        _tft->setRotation(_config->orientation);
+        return SETTINGS_SCREEN_ENABLED;
+        #endif
+        break;
+    }
+  }
   // Navigate to settings menu.
   if (input->touch_x > 205 && input->touch_y > 205) {
     #ifdef SETTINGS_SCREEN_ENABLED

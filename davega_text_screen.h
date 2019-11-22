@@ -45,6 +45,15 @@ protected:
     void _write_line_buffer(int lineno, uint16_t color = ILI9341_WHITE);
 
     char _line_buffer[MAX_LINE_LENGTH+1];
+
+    Button flip_screen_button = {100, 215, 101, 20};
+    Button settings_button = {210, 215, 101, 20};
+   // Array of available buttons and a cursor to iterate them with buttons.
+    Button buttons[2] = {
+      flip_screen_button,
+      settings_button,
+    };
+    uint8_t buttonCursor = 0;
 };
 
 #endif //DAVEGA_TEXT_SCREEN_H

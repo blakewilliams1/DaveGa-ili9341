@@ -27,6 +27,8 @@
 
 void DavegaSettingsScreen::reset() {
   _tft->fillScreen(ILI9341_BLACK);
+  buttonCursor = 0;
+  updateHighlighting(temp_units_coords, temp_units_coords, _tft);
 
   // Temp units
   _tft->setTextColor(ILI9341_WHITE);
@@ -221,8 +223,69 @@ void DavegaSettingsScreen::heartbeat(uint32_t duration_ms, bool successful_vesc_
 }
 
 uint8_t DavegaSettingsScreen::handleTouchInput(t_davega_button_input* input) {
-  // Toggle temp units.
+  // Allows reset to run after all important logic finshes.
   bool trigger_redraw = false;
+  if (input->button_1_pressed) {
+    Button oldButton = buttons[buttonCursor];
+    buttonCursor = (buttonCursor + 1) % LEN(buttons);
+    updateHighlighting(oldButton, buttons[buttonCursor], _tft);
+  } else if (input->button_3_pressed) {
+    Button oldButton = buttons[buttonCursor];
+    buttonCursor = (buttonCursor + LEN(buttons) - 1) % LEN(buttons);
+    updateHighlighting(oldButton, buttons[buttonCursor], _tft);
+  } else if (input->button_2_pressed) {
+    switch(buttonCursor) {
+      case 0: 
+        _config->use_fahrenheit = !_config->use_fahrenheit;
+        trigger_redraw = true;
+        break;
+      case 1: 
+        _config->imperial_units = !_config->imperial_units;
+        trigger_redraw = true;
+        break;
+      case 2: 
+        trigger_redraw = true;
+        _primary_options_index++;
+        if (_primary_options_index > 2) _primary_options_index = 0;
+        _config->primary_screen_item = primary_options[_primary_options_index];
+      case 3: 
+        _config->orientation = (_config->orientation + 2) % 4;
+        _tft->setRotation(_config->orientation);
+        reset();
+        break;
+      case 4: 
+        #ifdef SIMPLE_HORIZONTAL_SCREEN_ENABLED
+        return SIMPLE_HORIZONTAL_SCREEN_ENABLED;
+        #endif
+      case 5: 
+      // Consider removing this.
+        #ifdef SIMPLE_VERTICAL_SCREEN_ENABLED
+        _config->orientation = PORTRAIT_ORIENTATION;
+        _tft->setRotation(_config->orientation);
+        return SIMPLE_VERTICAL_SCREEN_ENABLED;
+        #endif
+        break;
+      case 6: 
+        #ifdef TEXT_SCREEN_ENABLED
+        return TEXT_SCREEN_ENABLED;
+        #endif
+        break;
+      case 7: 
+        #ifdef REALTIME_STATS_SCREEN_ENABLED
+        return REALTIME_STATS_SCREEN_ENABLED;
+        #endif
+        break;
+      case 8: 
+        #ifdef DEFAULT_SCREEN_ENABLED
+        _config->orientation = PORTRAIT_ORIENTATION;
+        _tft->setRotation(_config->orientation);
+        return DEFAULT_SCREEN_ENABLED;
+        #endif
+        break;
+    }
+  }
+
+  // Toggle temp units.
   if (input->touch_x > temp_units_coords.x - 10 &&
       input->touch_x < temp_units_coords.x + 60 &&
       input->touch_y < temp_units_coords.y + 45) {

@@ -135,3 +135,15 @@ uint16_t progress_to_color(float progress, ILI9341_t3* tft) {
     float brightness = 255.0 * (1.0 - progress);
     return  tft->color565(brightness,brightness,brightness);//tft->setColor(brightness, brightness, brightness);
 }
+
+void updateHighlighting(Button oldButton, Button newButton, ILI9341_t3* tft) {
+  tft->drawRect(oldButton.x - 2, oldButton.y - 2, oldButton.width + 4, 2, ILI9341_BLACK);
+  tft->drawRect(oldButton.x + oldButton.width, oldButton.y - 2, 2, oldButton.height + 4, ILI9341_BLACK);
+  tft->drawRect(oldButton.x - 2, oldButton.y + oldButton.height, oldButton.width + 4, 2, ILI9341_BLACK);
+  tft->drawRect(oldButton.x - 2, oldButton.y - 2, 2, oldButton.height + 4, ILI9341_BLACK);
+
+  tft->drawRect(newButton.x - 2, newButton.y - 2, newButton.width + 4, 2, ILI9341_RED);
+  tft->drawRect(newButton.x + newButton.width, newButton.y - 2, 2, newButton.height + 4, ILI9341_RED);
+  tft->drawRect(newButton.x - 2, newButton.y + newButton.height, newButton.width + 4, 2, ILI9341_RED);
+  tft->drawRect(newButton.x - 2, newButton.y - 2, 2, newButton.height + 4, ILI9341_RED);
+}

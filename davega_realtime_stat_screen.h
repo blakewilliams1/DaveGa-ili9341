@@ -70,6 +70,14 @@ protected:
     float _get_item_value(t_davega_data* data, t_screen_item item);
     void _update_battery_indicator(float battery_percent, bool redraw = false);
 
+    Button change_graph_button = {100, 220, 100, 18};
+    Button settings_button = {216, 220, 100, 18};
+   // Array of available buttons and a cursor to iterate them with buttons.
+    Button buttons[2] = {
+      change_graph_button,
+      settings_button,
+    };
+    uint8_t buttonCursor = 0;
 private:
     void draw_graph_menu();
     void draw_checkmark(uint16_t x, uint16_t y, bool checked);

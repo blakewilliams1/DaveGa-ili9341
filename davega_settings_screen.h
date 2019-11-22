@@ -52,6 +52,19 @@ protected:
     Button text_screen_coords = {220, 115, 70, 40};
     Button realtime_graph_coords = {20, 175, 70, 40};
     Button default_screen_coords = {120, 175, 70, 40};
+		// Array of available buttons and a cursor to iterate them with buttons.
+		Button buttons[9] = {
+			temp_units_coords,
+			other_units_coords,
+			primary_value_coords,
+			rotate_screen_coords,
+			simple_horizontal_coords,
+			simple_vertical_coords,
+			text_screen_coords,
+			realtime_graph_coords,
+			default_screen_coords,
+		};
+		uint8_t buttonCursor = 0;
 
     vesc_comm_fault_code _last_fault_code = FAULT_CODE_NONE;
 

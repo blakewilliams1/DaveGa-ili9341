@@ -21,6 +21,7 @@
 #define DAVEGA_SCREEN_H
 
 #include "davega_data.h"
+#include "tft_util.h"
 
 typedef enum {
     SCR_FW_VERSION = 0,

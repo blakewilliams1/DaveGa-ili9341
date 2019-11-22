@@ -53,6 +53,15 @@ protected:
     t_screen_item _primary_item = _primary_item;
 
     void _update_battery_indicator(float battery_percent, bool redraw = false);
+
+    Button flip_screen_button = {3, 295, 111, 20};
+    Button settings_button = {123, 295, 111, 20};
+   // Array of available buttons and a cursor to iterate them with buttons.
+    Button buttons[2] = {
+      flip_screen_button,
+      settings_button,
+    };
+    uint8_t buttonCursor = 0;
 };
 
 #endif //DAVEGA_SIMPLE_VERTICAL_SCREEN_H

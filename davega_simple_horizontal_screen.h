@@ -47,6 +47,16 @@ protected:
     vesc_comm_fault_code _last_fault_code = FAULT_CODE_NONE;
 
     void _update_battery_indicator(float battery_percent, bool redraw = false);
+
+
+    Button flip_screen_button = {3, 295, 111, 20};
+    Button settings_button = {123, 295, 111, 20};
+   // Array of available buttons and a cursor to iterate them with buttons.
+    Button buttons[2] = {
+      flip_screen_button,
+      settings_button,
+    };
+    uint8_t buttonCursor = 0;
 };
 
 #endif //DAVEGA_SIMPLE_HORIZONTAL_SCREEN_H

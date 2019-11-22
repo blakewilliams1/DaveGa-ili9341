@@ -22,6 +22,18 @@
 
 #include <ILI9341_t3.h> // Hardware-specific library
 
+typedef struct {
+    uint16_t x;
+    uint16_t y;
+} Point;
+
+typedef struct {
+    uint16_t x;
+    uint16_t y;
+    uint16_t width;
+    uint16_t height;
+} Button;
+
 void tft_util_draw_digit(
         ILI9341_t3* tft, uint8_t digit, uint16_t x, uint16_t y,
         uint16_t fg_color, uint16_t bg_color, uint8_t magnify = 1);
@@ -31,5 +43,7 @@ void tft_util_draw_number(
         uint16_t fg_color, uint16_t bg_color, uint8_t spacing, uint8_t magnify = 1);
 
 uint16_t progress_to_color(float progress, ILI9341_t3* tft);
+
+void updateHighlighting(Button oldButton, Button newButton, ILI9341_t3* tft);
 
 #endif //TFT_UTIL_H
