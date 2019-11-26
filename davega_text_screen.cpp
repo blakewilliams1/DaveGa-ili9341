@@ -28,14 +28,23 @@
 void DavegaTextScreen::reset() {
   _tft->fillScreen(ILI9341_BLACK);
 
+  updateHighlighting(buttons[buttonCursor], buttons[buttonCursor], _tft);
   // Draw settings button.
-  _tft->fillRect(210, 215, 101, 20, ILI9341_WHITE);
+    _tft->fillRect(
+        settings_button.x,
+        settings_button.y,
+        settings_button.width,
+        settings_button.height, ILI9341_WHITE);
   _tft->setTextColor(ILI9341_BLACK);
   _tft->setCursor(240, 223);
   _tft->print("Settings");
 
   // Draw flip screen button.
-  _tft->fillRect(100, 215, 101, 20, ILI9341_WHITE);
+    _tft->fillRect(
+       flip_screen_button.x,
+        flip_screen_button.y,
+        flip_screen_button.width,
+        flip_screen_button.height, ILI9341_WHITE);
   _tft->setTextColor(ILI9341_BLACK);
   _tft->setCursor(120, 223);
   _tft->print("Flip Screen");
@@ -217,7 +226,7 @@ uint8_t DavegaTextScreen::handleTouchInput(t_davega_button_input* input) {
         break;
       case 1: 
         #ifdef SETTINGS_SCREEN_ENABLED
-        _config->orientation = LANDSCAPE_ORIENTATION;
+        _config->orientation = LANDSCAPE_ORIENTATION + 2;
         _tft->setRotation(_config->orientation);
         return SETTINGS_SCREEN_ENABLED;
         #endif

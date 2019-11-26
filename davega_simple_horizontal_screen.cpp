@@ -59,19 +59,15 @@ void DavegaSimpleHorizontalScreen::reset() {
 				flip_screen_button.y,
 				flip_screen_button.width,
 				flip_screen_button.height, ILI9341_WHITE);
-    _tft->setCursor(30, 227);
+    _tft->setCursor(50, 227);
     _tft->print("Flip Screen");
-
-    _tft->fillRect(109, 220, 101, 20, ILI9341_WHITE);
-    _tft->setCursor(137, 227);
-    _tft->print("BUTTON 2");
 
     _tft->fillRect(
 				settings_button.x,
 				settings_button.y,
 				settings_button.width,
 				settings_button.height, ILI9341_WHITE);
-    _tft->setCursor(244, 227);
+    _tft->setCursor(224, 227);
     _tft->print("Settings");
 
     // FW version
@@ -180,7 +176,7 @@ uint8_t DavegaSimpleHorizontalScreen::handleTouchInput(t_davega_button_input* in
         break;
       case 1: 
         #ifdef SETTINGS_SCREEN_ENABLED
-        _config->orientation = LANDSCAPE_ORIENTATION;
+        _config->orientation = LANDSCAPE_ORIENTATION + 2;
         _tft->setRotation(_config->orientation);
         return SETTINGS_SCREEN_ENABLED;
         #endif
@@ -189,13 +185,13 @@ uint8_t DavegaSimpleHorizontalScreen::handleTouchInput(t_davega_button_input* in
   }
 
   // Rotate the screen 180 degrees.
-  if (input->touch_x < 103 && input->touch_y > 210) {
+  if (input->touch_x < 160 && input->touch_y > 210) {
     _config->orientation = (_config->orientation + 2) % 4;
     _tft->setRotation(_config->orientation);
     reset();
   }
 
-  if (input->touch_x > 215 && input->touch_y > 210) {
+  if (input->touch_x > 160 && input->touch_y > 210) {
     #ifdef SETTINGS_SCREEN_ENABLED
     _config->orientation = LANDSCAPE_ORIENTATION;
     _tft->setRotation(_config->orientation);

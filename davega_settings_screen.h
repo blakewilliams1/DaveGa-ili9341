@@ -38,6 +38,7 @@ public:
     uint8_t handleTouchInput(t_davega_button_input* input);
 
 protected:
+    void reset(bool resetCursor);
     t_screen_item primary_options[3] = {SCR_SPEED, SCR_MOTOR_CURRENT, SCR_BATTERY_CURRENT};
     uint8_t _primary_options_index = 0;
     // Have we just reset the screen? Unset by the first update() call.
@@ -53,7 +54,7 @@ protected:
     Button realtime_graph_coords = {20, 175, 70, 40};
     Button default_screen_coords = {120, 175, 70, 40};
 		// Array of available buttons and a cursor to iterate them with buttons.
-		Button buttons[9] = {
+		Button buttons[8] = {
 			temp_units_coords,
 			other_units_coords,
 			primary_value_coords,
@@ -62,7 +63,6 @@ protected:
 			simple_vertical_coords,
 			text_screen_coords,
 			realtime_graph_coords,
-			default_screen_coords,
 		};
 		uint8_t buttonCursor = 0;
 

@@ -49,8 +49,8 @@ protected:
     void _update_battery_indicator(float battery_percent, bool redraw = false);
 
 
-    Button flip_screen_button = {3, 295, 111, 20};
-    Button settings_button = {123, 295, 111, 20};
+    Button flip_screen_button = {3, 218, 156, 20};
+    Button settings_button = {162, 218, 156, 20};
    // Array of available buttons and a cursor to iterate them with buttons.
     Button buttons[2] = {
       flip_screen_button,

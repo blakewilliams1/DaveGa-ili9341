@@ -77,6 +77,24 @@ protected:
       change_graph_button,
       settings_button,
     };
+
+    Button speed_button = {15, 15, 120, 60};
+    Button battery_amp_button = {175, 15, 120, 60};
+    Button motor_amp_button = {15, 75, 120, 60};
+    Button motor_temp_button = {175, 75, 120, 60};
+    Button duty_cycle_button = {15, 135, 120, 60};
+    Button fet_temp_button = {175, 135, 120, 60};
+    Button back_button = {190, 220, 126, 17};
+    Button graph_setting_buttons[7] = {
+			speed_button,
+			battery_amp_button,
+			motor_amp_button,
+			motor_temp_button,
+			duty_cycle_button,
+			fet_temp_button,
+      back_button,
+    };
+
     uint8_t buttonCursor = 0;
 private:
     void draw_graph_menu();

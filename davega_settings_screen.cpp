@@ -25,10 +25,17 @@
 #include "tft_util.h"
 #include <ILI9341_t3.h> // Hardware-specific library
 
+
 void DavegaSettingsScreen::reset() {
+  reset(true);
+}
+
+void DavegaSettingsScreen::reset(bool resetCursor) {
   _tft->fillScreen(ILI9341_BLACK);
-  buttonCursor = 0;
-  updateHighlighting(temp_units_coords, temp_units_coords, _tft);
+  if (resetCursor) {
+    buttonCursor = 0;
+  }
+  updateHighlighting(buttons[buttonCursor], buttons[buttonCursor], _tft);
 
   // Temp units
   _tft->setTextColor(ILI9341_WHITE);
@@ -321,7 +328,7 @@ uint8_t DavegaSettingsScreen::handleTouchInput(t_davega_button_input* input) {
   }
 
   if (trigger_redraw) { 
-    reset();
+    reset(false);
   }
 
   // Location of simple horizontal button with 5px margin.

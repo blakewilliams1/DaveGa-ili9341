@@ -37,9 +37,9 @@
 #endif
 
 // 15, 16, 17 on Teensy 4.0
-#define BUTTON_1_PIN 36
-#define BUTTON_2_PIN 35
-#define BUTTON_3_PIN 34
+#define BUTTON_1_PIN A2
+#define BUTTON_2_PIN A4
+#define BUTTON_3_PIN A3
 
 #ifdef FOCBOX_UNITY
 #include "vesc_comm_unity.h"
@@ -85,6 +85,9 @@ DavegaTextScreen davega_text_screen = DavegaTextScreen();
 #endif
 
 DavegaScreen* davega_screens[] = {
+#ifdef SIMPLE_HORIZONTAL_SCREEN_ENABLED
+  &davega_simple_horizontal_screen,
+#endif
 #ifdef REALTIME_STATS_SCREEN_ENABLED
   &davega_realtime_stats_screen,
 #endif
@@ -93,9 +96,6 @@ DavegaScreen* davega_screens[] = {
 #endif
 #ifdef DEFAULT_SCREEN_ENABLED
   &davega_default_screen,
-#endif
-#ifdef SIMPLE_HORIZONTAL_SCREEN_ENABLED
-  &davega_simple_horizontal_screen,
 #endif
 #ifdef VERTICAL_SETTINGS_SCREEN_ENABLED
   &davega_vertical_settings_screen,
@@ -226,14 +226,6 @@ void setup() {
 
   scr->reset();
   scr->update(&data);
-  #ifdef LED_CONTROLLER_SCREEN_ENABLED
-  
-  if ((millis() / 1000) % 2 == 0) {
-    digitalWrite(30, HIGH);
-  }
-
-  led_controller->update(&data);
-  #endif
 
   // TODO: Remove this after testing.
   //while(true)scr->update(&data);
@@ -344,17 +336,23 @@ void loop() {
   bool button_3_pressed = false;
   if (digitalRead(BUTTON_3_PIN) == LOW) {
     button_3_pressed = true;
-    button_3_last_up_time = millis();
+    if (!button_3_pressed_prev) {
+      button_3_last_up_time = millis();
+    }
   }
 
   if (digitalRead(BUTTON_1_PIN) == LOW) {
     button_1_pressed = true;
-    button_1_last_up_time = millis();
+    if (!button_1_pressed_prev) {
+      button_1_last_up_time = millis();
+    }
   }
 
   if (digitalRead(BUTTON_2_PIN) == LOW) {
     button_2_pressed = true;
-    button_2_last_up_time = millis();
+    if (!button_2_pressed_prev) {
+      button_2_last_up_time = millis();
+    }
   }
 
 
@@ -434,8 +432,10 @@ void loop() {
   int32_t mah_spent = initial_mah_spent + vesc_mah_spent;
   int32_t mah = BATTERY_MAX_MAH * BATTERY_USABLE_CAPACITY - mah_spent;
 
-  /*uint32_t button_2_down_elapsed = millis() - button_2_last_up_time;
-  if (button_2_down_elapsed > COUNTER_RESET_TIME) {
+  uint32_t button_1_down_elapsed = button_1_pressed ? millis() - button_1_last_up_time : 0;
+  uint32_t button_2_down_elapsed = button_2_pressed ? millis() - button_2_last_up_time : 0;
+  uint32_t button_3_down_elapsed = button_3_pressed ? millis() - button_3_last_up_time : 0;
+  /*if (button_2_down_elapsed > COUNTER_RESET_TIME) {
     // reset coulomb counter
     mah = voltage_to_percent(data.voltage) * BATTERY_MAX_MAH * BATTERY_USABLE_CAPACITY;
     mah_spent = BATTERY_MAX_MAH * BATTERY_USABLE_CAPACITY - mah;
@@ -446,15 +446,13 @@ void loop() {
   data.mah = mah;
 
   // dim mAh if the counter is about to be reset
-  //data.mah_reset_progress = min(1.0 * button_2_down_elapsed / COUNTER_RESET_TIME, 1.0);
+  data.mah_reset_progress = min(1.0 * button_2_down_elapsed / COUNTER_RESET_TIME, 1.0);
 
   int32_t rpm = vesc_comm.get_rpm();
   data.speed_kph = max(erpm_to_kph(rpm), 0);
 
   int32_t tachometer = rotations_to_meters(vesc_comm.get_tachometer() / 6);
 
-  uint32_t button_1_down_elapsed = millis() - button_1_last_up_time;
-  //uint32_t button_3_down_elapsed = millis() - button_3_last_up_time;
   /*if (button_1_down_elapsed > COUNTER_RESET_TIME) {
     // reset session
     session_data.trip_meters = 0;

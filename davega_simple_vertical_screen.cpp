@@ -176,7 +176,7 @@ uint8_t DavegaSimpleVerticalScreen::handleTouchInput(t_davega_button_input* inpu
         break;
       case 1:
         #ifdef SETTINGS_SCREEN_ENABLED
-        _config->orientation = LANDSCAPE_ORIENTATION;
+        _config->orientation = LANDSCAPE_ORIENTATION + 2;
         _tft->setRotation(_config->orientation);
         return SETTINGS_SCREEN_ENABLED;
         #endif

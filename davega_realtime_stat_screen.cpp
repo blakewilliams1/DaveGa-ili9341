@@ -24,10 +24,12 @@
 #include "tft_util.h"
 #include <ILI9341_t3.h> // Hardware-specific library
 
+
 void DavegaRealtimeStatScreen::reset() {
   _selecting_graphs = false;
   _tft->fillScreen(ILI9341_BLACK);
-  
+	buttonCursor = 0;
+
   updateHighlighting(settings_button, settings_button, _tft);
 
   // X axis location is dynamic based on max and min values to display
@@ -181,7 +183,7 @@ void DavegaRealtimeStatScreen::draw_graph_menu() {
 
 uint8_t DavegaRealtimeStatScreen::handleTouchInput(t_davega_button_input* input) {
   // Debug code
-  _tft->fillRect(120, 100, 100, 50, ILI9341_BLUE);
+  /*_tft->fillRect(120, 100, 100, 50, ILI9341_BLUE);
   _tft->setCursor(130, 110);
   _tft->print(input->button_1_pressed);
   _tft->setCursor(130, 120);
@@ -190,36 +192,35 @@ uint8_t DavegaRealtimeStatScreen::handleTouchInput(t_davega_button_input* input)
   _tft->print(buttonCursor);
   if (input->touch_x > 0 && input->touch_y > 0) {
     _last_press = millis();
-  }
+  }*/
   // end debug code
-  if (input->button_1_pressed) {
-    Button oldButton = buttons[buttonCursor];
-    buttonCursor = (buttonCursor + 1) % LEN(buttons);
-    updateHighlighting(oldButton, buttons[buttonCursor], _tft);
-  } else if (input->button_3_pressed) {
-    Button oldButton = buttons[buttonCursor];
-    buttonCursor = (buttonCursor + LEN(buttons) - 1) % LEN(buttons);
-    updateHighlighting(oldButton, buttons[buttonCursor], _tft);
-  } else if (input->button_2_pressed) {
-    switch(buttonCursor) {
-      case 0:
-        _selecting_graphs = true;
-        _last_screen_switch = millis();
-        draw_graph_menu();
-        break;
-      case 1: 
-        #ifdef SETTINGS_SCREEN_ENABLED
-        _config->orientation = LANDSCAPE_ORIENTATION;
-        _tft->setRotation(_config->orientation);
-        return SETTINGS_SCREEN_ENABLED;
-        #endif
-        break;
-    }
-  }
 
   long since_last_switch = millis() - _last_screen_switch;
-  if (_selecting_graphs) {
-    // Iterate through the locations of all the graph type buttons.
+	if (_selecting_graphs) {
+		if (input->button_1_pressed) {
+			Button oldButton = graph_setting_buttons[buttonCursor];
+			buttonCursor = (buttonCursor + 1) % LEN(graph_setting_buttons);
+			updateHighlighting(oldButton, graph_setting_buttons[buttonCursor], _tft);
+		} else if (input->button_3_pressed) {
+			Button oldButton = graph_setting_buttons[buttonCursor];
+			buttonCursor =
+			    (buttonCursor + LEN(graph_setting_buttons) - 1) % LEN(graph_setting_buttons);
+			updateHighlighting(oldButton, graph_setting_buttons[buttonCursor], _tft);
+		} else if (input->button_2_pressed) {
+			// toggle graph
+			if (buttonCursor <= 5) {
+				graph_elements[buttonCursor].visible = !graph_elements[buttonCursor].visible;
+				_last_press = millis();
+				draw_graph_menu();
+			} else {
+				// Go back to graphs.
+				_selecting_graphs = false;
+				_last_screen_switch = millis();
+				reset();
+  			updateHighlighting(graph_setting_buttons[buttonCursor], graph_setting_buttons[buttonCursor], _tft);
+			}
+		}
+			// Iterate through the locations of all the graph type buttons.
     for (uint8_t i = 0; i < 6; i++) {
       uint16_t x = 30 + 160 * (i % 2);
       uint16_t y = 30 + 60 * (i / 2);
@@ -241,10 +242,37 @@ uint8_t DavegaRealtimeStatScreen::handleTouchInput(t_davega_button_input* input)
       reset();
     }
   } else {
+		// Not in selecting graphs menu
+		if (input->button_1_pressed) {
+			Button oldButton = buttons[buttonCursor];
+			buttonCursor = (buttonCursor + 1) % LEN(buttons);
+			updateHighlighting(oldButton, buttons[buttonCursor], _tft);
+		} else if (input->button_3_pressed) {
+			Button oldButton = buttons[buttonCursor];
+			buttonCursor = (buttonCursor + LEN(buttons) - 1) % LEN(buttons);
+			updateHighlighting(oldButton, buttons[buttonCursor], _tft);
+		} else if (input->button_2_pressed) {
+			switch(buttonCursor) {
+				case 0:
+					_selecting_graphs = true;
+					_last_screen_switch = millis();
+					draw_graph_menu();
+					buttonCursor = 0;
+          updateHighlighting(speed_button, speed_button, _tft);
+					break;
+				case 1: 
+					#ifdef SETTINGS_SCREEN_ENABLED
+					_config->orientation = LANDSCAPE_ORIENTATION;
+					_tft->setRotation(_config->orientation);
+					return SETTINGS_SCREEN_ENABLED;
+					#endif
+					break;
+			}
+		}
     // Navigate to settings menu.
     if (input->touch_x > 215 && input->touch_y > 210 && since_last_switch > 1000) {
       #ifdef SETTINGS_SCREEN_ENABLED
-      _config->orientation = LANDSCAPE_ORIENTATION + 2;
+      _config->orientation += 2;
       _tft->setRotation(_config->orientation);
       return SETTINGS_SCREEN_ENABLED;
       #endif
