@@ -37,9 +37,9 @@
 #endif
 
 // 15, 16, 17 on Teensy 4.0
-#define BUTTON_1_PIN A2
-#define BUTTON_2_PIN A4
-#define BUTTON_3_PIN A3
+#define BUTTON_1_PIN A3
+#define BUTTON_2_PIN A2
+#define BUTTON_3_PIN A4
 
 #ifdef FOCBOX_UNITY
 #include "vesc_comm_unity.h"

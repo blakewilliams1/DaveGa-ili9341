@@ -53,7 +53,7 @@ protected:
 
     long _last_screen_switch = 0;
     long _last_press = 0;
-    float _max_y_value = 50.0f;
+    float _max_y_value = 30.0f;
     float _min_y_value = -15.0f;
     uint16_t _x_position = 0;
     GraphElement graph_elements[6] = {
@@ -98,6 +98,7 @@ protected:
     uint8_t buttonCursor = 0;
 private:
     void draw_graph_menu();
+    void draw_axis_indicator();
     void draw_checkmark(uint16_t x, uint16_t y, bool checked);
 };
 

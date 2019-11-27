@@ -31,23 +31,8 @@ void DavegaRealtimeStatScreen::reset() {
 	buttonCursor = 0;
 
   updateHighlighting(settings_button, settings_button, _tft);
-
-  // X axis location is dynamic based on max and min values to display
-  int x_axis = (_max_y_value * 220) / (_max_y_value - _min_y_value);
-  _tft->drawLine(15, x_axis, 320, x_axis, ILI9341_WHITE);
-  // Y axis. Last 20 pixels on bottom of screen are for text and buttons.
-  _tft->drawLine(15, 0, 15, 220, ILI9341_WHITE);
-
   // Draw axis info
-  _tft->setTextColor(ILI9341_WHITE);
-  _tft->setCursor(5, x_axis - 4);
-  _tft->print("0");
-  _tft->setCursor(245, 5);
-  _tft->print("Y Axis");
-  _tft->setCursor(245, 15);
-  _tft->print("Max: " + String(_max_y_value));
-  _tft->setCursor(245, 25);
-  _tft->print("Min: " + String(_min_y_value));
+  draw_axis_indicator();
 
   // FW version
   _tft->setCursor(5, 230);
@@ -71,13 +56,18 @@ void DavegaRealtimeStatScreen::update(t_davega_data *data) {
     reset();
 
   if (!_selecting_graphs) {
+
+    // Draw axis info
+    draw_axis_indicator();
+
     int y_axis = (_max_y_value * 220) / (_max_y_value - _min_y_value);
     float item_value = 0;
     short prev_value = 0;
+    bool should_redraw_graph = false;
     // Iterate over graphs and draw the selected ones.
     for (int i = 0; i < 6; i++) {
       if (!graph_elements[i].visible) continue;
-  
+
       item_value = _get_item_value(data, graph_elements[i].item_type);
       prev_value = _x_position > 0 ? graph_lines[_x_position - 1][i] / 100 : 0;
       graph_lines[_x_position][i] = (short)item_value * 100;
@@ -85,8 +75,17 @@ void DavegaRealtimeStatScreen::update(t_davega_data *data) {
       int curr_y_coord = ((item_value - _min_y_value) * -220) / (_max_y_value - _min_y_value) + 220;
       int prev_y_coord = ((prev_value - _min_y_value) * -220) / (_max_y_value - _min_y_value) + 220;
       _tft->drawLine(_x_position + 15, curr_y_coord, _x_position + 14, prev_y_coord, graph_elements[i].color);
+
+      if (item_value > _max_y_value && item_value < 2000) {
+        _max_y_value = item_value;
+        should_redraw_graph = true;
+      }
+      if (item_value < _min_y_value && item_value > -2000) {
+        _min_y_value = item_value;
+        should_redraw_graph = true;
+      }
     }
-  
+
     // Clean upcoming graph space and remove past wipe's graph lines
     int y_top = 0;
     // Prevents smearing of the Y axis info.
@@ -95,9 +94,30 @@ void DavegaRealtimeStatScreen::update(t_davega_data *data) {
     }
     _tft->drawLine(_x_position + 16, y_top, _x_position + 16, y_axis - 1, ILI9341_BLACK);
     _tft->drawLine(_x_position + 16, y_axis + 1, _x_position + 16, 220, ILI9341_BLACK);
-  
+
     _x_position++;
-    if (_x_position >= 305) _x_position = 0;
+    if (_x_position >= 305) {
+      _x_position = 0;
+      _max_y_value = 30.0f;
+      _min_y_value = -15.0f;
+    }
+
+    // Dynamically adjust the graph to fit the data needed.
+    if (should_redraw_graph) { 
+      _tft->fillScreen(ILI9341_BLACK);
+      draw_axis_indicator();
+      for(int x = 0; x < _x_position; x++) {
+        for (int i = 0; i < 6; i++) {
+          if (!graph_elements[i].visible) continue;
+          item_value = graph_lines[x][i] / 100;
+          prev_value = x > 0 ? graph_lines[x - 1][i] / 100 : 0;
+          // Y coords derived from affine transformations.
+          int curr_y_coord = ((item_value - _min_y_value) * -220) / (_max_y_value - _min_y_value) + 220;
+          int prev_y_coord = ((prev_value - _min_y_value) * -220) / (_max_y_value - _min_y_value) + 220;
+          _tft->drawLine(x + 15, curr_y_coord, x + 14, prev_y_coord, graph_elements[i].color);
+        }
+      }
+    }
   }
 
   // warning
@@ -112,6 +132,25 @@ void DavegaRealtimeStatScreen::update(t_davega_data *data) {
 
   _last_fault_code = data->vesc_fault_code;
   _just_reset = false;
+}
+
+void DavegaRealtimeStatScreen::draw_axis_indicator() {
+  _tft->drawRect(0, 0, 14, 220, ILI9341_BLACK);
+  // X axis location is dynamic based on max and min values to display
+  int x_axis = (_max_y_value * 220) / (_max_y_value - _min_y_value);
+  _tft->drawLine(15, x_axis, 320, x_axis, ILI9341_WHITE);
+  // Y axis. Last 20 pixels on bottom of screen are for text and buttons.
+  _tft->drawLine(15, 0, 15, 220, ILI9341_WHITE);
+
+  _tft->setTextColor(ILI9341_WHITE);
+  _tft->setCursor(5, x_axis - 4);
+  _tft->print("0");
+  _tft->setCursor(245, 5);
+  _tft->print("Y Axis");
+  _tft->setCursor(245, 15);
+  _tft->print("Max: " + String(_max_y_value));
+  _tft->setCursor(245, 25);
+  _tft->print("Min: " + String(_min_y_value));
 }
 
 float DavegaRealtimeStatScreen::_get_item_value(t_davega_data* data, t_screen_item item) {
@@ -149,7 +188,7 @@ void DavegaRealtimeStatScreen::draw_checkmark(uint16_t x, uint16_t y, bool check
 }
 
 void DavegaRealtimeStatScreen::_update_battery_indicator(float battery_percent, bool redraw) {
-  _tft->fillRect(50, 220, 45, 30, ILI9341_BLACK);
+  _tft->fillRect(50, 223, 45, 30, ILI9341_BLACK);
   _tft->setTextColor(ILI9341_WHITE);
   _tft->setCursor(60, 230);
   _tft->print(String(battery_percent * 100) + "%");
@@ -217,7 +256,8 @@ uint8_t DavegaRealtimeStatScreen::handleTouchInput(t_davega_button_input* input)
 				_selecting_graphs = false;
 				_last_screen_switch = millis();
 				reset();
-  			updateHighlighting(graph_setting_buttons[buttonCursor], graph_setting_buttons[buttonCursor], _tft);
+        buttonCursor = 0;
+  			updateHighlighting(buttons[buttonCursor], buttons[buttonCursor], _tft);
 			}
 		}
 			// Iterate through the locations of all the graph type buttons.
